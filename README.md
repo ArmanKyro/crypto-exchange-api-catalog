@@ -7,6 +7,22 @@
 
 A robust, extensible system for discovering and cataloging cryptocurrency exchange APIs. Generates machine-readable JSON specifications for use in data ingestion applications.
 
+---
+
+## ⚠️ IMPORTANT DISCLAIMER
+
+**THIS IS EXPERIMENTAL SOFTWARE FOR INFORMATIONAL PURPOSES ONLY.**
+
+- **NOT a trading system** - This software provides API catalog information only
+- **NO WARRANTY** - Provided "as is" without guarantees of accuracy or completeness
+- **NO LIABILITY** - Authors are not liable for trading losses or damages of any kind
+- **NO FINANCIAL ADVICE** - Does not constitute investment, trading, or financial advice
+- **USER RESPONSIBILITY** - You are solely responsible for verifying information and compliance with laws
+
+**See [DISCLAIMER.md](DISCLAIMER.md) for complete legal terms. By using this software, you accept all risks and responsibilities.**
+
+---
+
 ## Purpose
 
 This tool produces a comprehensive JSON catalog/specification from vendor APIs (starting with Coinbase), enabling applications to:
@@ -502,12 +518,31 @@ Log format:
 
 ## License
 
-[Specify your license]
+MIT License - Copyright © 2026 John Soprych / Elko.AI
+
+See [LICENSE](LICENSE) file for full details.
+
+**IMPORTANT:** This license grants permission to use the software, but **DOES NOT** provide any warranties or accept any liability. See [DISCLAIMER.md](DISCLAIMER.md) for complete legal terms.
 
 ## Contributing
 
-[Specify contribution guidelines]
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed contribution guidelines.
+
+By contributing, you agree that your contributions will be licensed under the MIT License and that you accept the terms in [DISCLAIMER.md](DISCLAIMER.md).
 
 ## Support
 
-For issues or questions, please [file an issue](https://github.com/yourusername/yourrepo/issues).
+For issues or questions:
+- **Bug Reports**: [File an issue](https://github.com/jsoprych/crypto-exchange-api-catalog/issues)
+- **Feature Requests**: [Submit a request](https://github.com/jsoprych/crypto-exchange-api-catalog/issues/new?template=feature_request.md)
+- **Vendor Requests**: [Request new exchange](https://github.com/jsoprych/crypto-exchange-api-catalog/issues/new?template=vendor_request.md)
+
+---
+
+## Legal Notice
+
+**EXPERIMENTAL SOFTWARE - USE AT YOUR OWN RISK**
+
+This software is provided for informational and educational purposes only. It is not a trading system, does not provide financial advice, and the authors accept no liability for trading losses or damages. Cryptocurrency trading involves substantial risk. See [DISCLAIMER.md](DISCLAIMER.md) for complete legal terms.
+
+By using this software, you acknowledge that you have read, understood, and agree to be bound by the terms in the disclaimer.

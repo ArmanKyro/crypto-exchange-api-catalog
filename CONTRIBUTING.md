@@ -2,6 +2,17 @@
 
 Thank you for considering contributing to this project! We welcome contributions from the community.
 
+## ⚠️ Contributor Acknowledgment
+
+By contributing to this project, you acknowledge and agree that:
+- This is **experimental software** for informational purposes only
+- You have read and understood the [DISCLAIMER.md](DISCLAIMER.md)
+- Your contributions are provided under the MIT License
+- You accept that the software comes with **NO WARRANTY** and **NO LIABILITY**
+- The project authors are not responsible for any trading losses or damages
+
+---
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
