@@ -21,8 +21,9 @@ The JSON specification is designed for **code generation** and will be used by f
 
 ### Multi-Vendor Support
 - **Extensible adapter pattern** - Easy to add new exchanges
-- **Coinbase Exchange** - Fully implemented (Phase 1: public endpoints)
-- **Future vendors** - Binance, Kraken, etc. ready to implement
+- **Coinbase Exchange** - Fully implemented and tested (776 products, Phase 1: public endpoints)
+- **Binance** - Fully implemented (12 REST endpoints, 7 WebSocket channels, may require VPN in restricted regions)
+- **Future vendors** - Kraken, Bitfinex, etc. ready to implement
 
 ### SQLite-Backed Storage
 - **Queryable database** - Powerful SQL analysis of API specifications

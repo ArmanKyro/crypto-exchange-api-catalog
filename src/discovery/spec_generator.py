@@ -9,6 +9,7 @@ from typing import Dict, Any, Optional
 
 from src.adapters.base_adapter import BaseVendorAdapter
 from src.adapters.coinbase_adapter import CoinbaseAdapter
+from src.adapters.binance_adapter import BinanceAdapter
 from src.database.repository import SpecificationRepository
 from src.utils.logger import get_logger
 
@@ -151,6 +152,8 @@ class SpecificationGenerator:
         """
         if vendor_name == 'coinbase':
             return CoinbaseAdapter(vendor_config)
+        elif vendor_name == 'binance':
+            return BinanceAdapter(vendor_config)
         else:
             raise ValueError(f"Unknown vendor: {vendor_name}")
 
@@ -274,6 +277,13 @@ class SpecificationGenerator:
                 channel_ids,
                 adapter
             )
+        elif vendor_name == 'binance':
+            self._link_binance_feeds(
+                product_ids,
+                endpoint_ids,
+                channel_ids,
+                adapter
+            )
 
     def _link_coinbase_feeds(
         self,
@@ -343,3 +353,71 @@ class SpecificationGenerator:
                     )
 
         logger.info(f"Linked {len(product_ids)} products to feeds")
+
+    def _link_binance_feeds(
+        self,
+        product_ids: Dict[str, int],
+        endpoint_ids: Dict[str, int],
+        channel_ids: Dict[str, int],
+        adapter: BinanceAdapter
+    ):
+        """
+        Link Binance products to their feeds.
+
+        Args:
+            product_ids: Product IDs by symbol
+            endpoint_ids: Endpoint IDs by key
+            channel_ids: Channel IDs by name
+            adapter: Binance adapter instance
+        """
+        # Get kline intervals
+        kline_intervals = adapter.get_kline_intervals()
+
+        # Link each product to available feeds
+        for symbol, product_id in product_ids.items():
+            # REST feeds
+            # Ticker (24hr)
+            ticker_key = "GET /api/v3/ticker/24hr"
+            if ticker_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[ticker_key],
+                    'ticker'
+                )
+
+            # Klines (candlesticks)
+            klines_key = "GET /api/v3/klines"
+            if klines_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[klines_key],
+                    'candles',
+                    intervals=kline_intervals
+                )
+
+            # Trades
+            trades_key = "GET /api/v3/trades"
+            if trades_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[trades_key],
+                    'trades'
+                )
+
+            # Order book (depth)
+            depth_key = "GET /api/v3/depth"
+            if depth_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[depth_key],
+                    'orderbook'
+                )
+
+            # WebSocket channels - all products support all channels
+            for channel_name, channel_id in channel_ids.items():
+                self.repository.link_product_to_ws_channel(
+                    product_id,
+                    channel_id
+                )
+
+        logger.info(f"Linked {len(product_ids)} Binance products to feeds")

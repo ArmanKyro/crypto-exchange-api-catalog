@@ -86,17 +86,24 @@ VENDORS = {
             "requires_api_key": False  # Phase 1: public only
         }
     },
-    # Future vendors
     "binance": {
-        "enabled": False,
+        "enabled": True,
         "display_name": "Binance",
         "base_url": "https://api.binance.com",
         "websocket_url": "wss://stream.binance.com:9443",
-        "documentation_url": "https://binance-docs.github.io/apidocs/",
+        "documentation_url": "https://binance-docs.github.io/apidocs/spot/en/",
         "discovery_methods": ["live_api_probing"],
+        "endpoints": {
+            "exchange_info": "/api/v3/exchangeInfo",
+            "time": "/api/v3/time",
+            "ping": "/api/v3/ping"
+        },
+        "rate_limits": {
+            "public": 20  # requests per second (approximate)
+        },
         "authentication": {
             "public_endpoints": True,
-            "requires_api_key": False
+            "requires_api_key": False  # Phase 1: public only
         }
     }
 }
