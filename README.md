@@ -66,6 +66,21 @@ pip install -r requirements.txt
 python3 main.py init
 ```
 
+### Rebuild Everything from Scratch
+
+To perform a complete fresh build with all exchanges:
+
+```bash
+./rebuild.sh
+```
+
+This script will:
+- Clean old data and output directories
+- Initialize a fresh database
+- Discover all 4 exchanges (Coinbase, Binance, Kraken, Bitfinex)
+- Export JSON catalogs in both snake_case and camelCase formats
+- Generate summary of all discovered data
+
 ## Quick Start
 
 ```bash
