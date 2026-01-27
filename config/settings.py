@@ -88,10 +88,10 @@ VENDORS = {
     },
     "binance": {
         "enabled": True,
-        "display_name": "Binance",
-        "base_url": "https://api.binance.com",
-        "websocket_url": "wss://stream.binance.com:9443",
-        "documentation_url": "https://binance-docs.github.io/apidocs/spot/en/",
+        "display_name": "Binance US",
+        "base_url": "https://api.binance.us",
+        "websocket_url": "wss://stream.binance.us:9443",
+        "documentation_url": "https://docs.binance.us/",
         "discovery_methods": ["live_api_probing"],
         "endpoints": {
             "exchange_info": "/api/v3/exchangeInfo",
