@@ -6,8 +6,8 @@ Get up and running with the Vendor API Specification Generator in 5 minutes.
 
 ```bash
 # Clone the repository
-git clone https://github.com/jsoprych/coinbase_catalog_to_json.git
-cd coinbase_catalog_to_json
+git clone https://github.com/jsoprych/crypto-exchange-api-catalog.git
+cd crypto-exchange-api-catalog
 
 # Create and activate virtual environment (recommended)
 python3 -m venv venv

@@ -17,8 +17,8 @@ Thank you for considering contributing to this project! We welcome contributions
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/coinbase_catalog_to_json.git
-   cd coinbase_catalog_to_json
+   git clone https://github.com/YOUR_USERNAME/crypto-exchange-api-catalog.git
+   cd crypto-exchange-api-catalog
    ```
 3. **Create a branch** for your changes:
    ```bash
@@ -360,8 +360,8 @@ When suggesting features:
 
 ## Questions?
 
-- **Issues**: https://github.com/jsoprych/coinbase_catalog_to_json/issues
-- **Discussions**: https://github.com/jsoprych/coinbase_catalog_to_json/discussions
+- **Issues**: https://github.com/jsoprych/crypto-exchange-api-catalog/issues
+- **Discussions**: https://github.com/jsoprych/crypto-exchange-api-catalog/discussions
 
 ## License
 

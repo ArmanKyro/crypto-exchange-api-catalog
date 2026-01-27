@@ -3,7 +3,7 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: PEP8](https://img.shields.io/badge/code%20style-PEP8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
-[![Maintained: Yes](https://img.shields.io/badge/Maintained-Yes-green.svg)](https://github.com/jsoprych/coinbase_catalog_to_json)
+[![Maintained: Yes](https://img.shields.io/badge/Maintained-Yes-green.svg)](https://github.com/jsoprych/crypto-exchange-api-catalog)
 
 A robust, extensible system for discovering and cataloging cryptocurrency exchange APIs. Generates machine-readable JSON specifications for use in data ingestion applications.
 
@@ -52,8 +52,8 @@ The JSON specification is designed for **code generation** and will be used by f
 
 ```bash
 # Clone the repository
-git clone https://github.com/jsoprych/coinbase_catalog_to_json.git
-cd coinbase_catalog_to_json
+git clone https://github.com/jsoprych/crypto-exchange-api-catalog.git
+cd crypto-exchange-api-catalog
 
 # Create and activate virtual environment (recommended)
 python3 -m venv venv
@@ -121,7 +121,7 @@ python main.py query "SELECT * FROM products WHERE base_currency = 'BTC'"
 ## Project Structure
 
 ```
-coinbase_catalog_to_json/
+crypto-exchange-api-catalog/
 ├── config/
 │   └── settings.py              # Configuration management
 ├── src/
