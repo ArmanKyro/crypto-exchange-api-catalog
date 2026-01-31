@@ -312,6 +312,6 @@ pip install -r requirements.txt
 
 ## Support
 
-For more detailed documentation, see [README.md](README.md).
+For more detailed documentation, see [README.md](README.md) and the [Database Context Guide](../data/DATABASE-CONTEXT.md) for comprehensive database schema and integration examples.
 
 For issues, check the log file: `api_spec_generator.log`

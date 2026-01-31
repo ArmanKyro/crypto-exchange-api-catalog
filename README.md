@@ -524,6 +524,8 @@ The SQLite database contains 17 tables:
 
 See `sql/schema.sql` for core DDL and `sql/mapping_schema.sql` for canonical mapping tables.
 
+**For comprehensive database documentation including schema details, usage examples, and integration guides, see [DATABASE-CONTEXT.md](data/DATABASE-CONTEXT.md).**
+
 ## Logging
 
 Logs are written to:
