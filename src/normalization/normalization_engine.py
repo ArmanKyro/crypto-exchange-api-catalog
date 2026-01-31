@@ -160,16 +160,17 @@ class NormalizationEngine:
 
         if isinstance(data, list):
             # Handle array data - apply normalization to each element
-            return [self._normalize_single(item, mappings, data_type) for item in data]
+            return [self._normalize_single(item, mappings, data_type, vendor_name) for item in data]
         else:
             # Handle single object
-            return self._normalize_single(data, mappings, data_type)
+            return self._normalize_single(data, mappings, data_type, vendor_name)
 
     def _normalize_single(
         self,
         data: Dict[str, Any],
         mappings: List[Dict[str, Any]],
-        data_type: str
+        data_type: str,
+        vendor_name: str
     ) -> Dict[str, Any]:
         """
         Normalize a single data object.
@@ -204,7 +205,113 @@ class NormalizationEngine:
         normalized['_normalized'] = True
         normalized['_mappings_applied'] = len([m for m in mappings if self._get_value_by_path(data, m['vendor_field_path']) is not None])
 
+        # Add derived fields
+        normalized = self._add_derived_fields(normalized, vendor_name, data_type, data)
+
         return normalized
+
+    def _add_derived_fields(
+        self,
+        normalized: Dict[str, Any],
+        vendor_name: str,
+        data_type: str,
+        original_data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Add derived/implied fields that aren't directly mapped.
+
+        Args:
+            normalized: Partially normalized data (after mappings applied)
+            vendor_name: Vendor name (e.g., 'coinbase')
+            data_type: Data type (e.g., 'ticker')
+            original_data: Original vendor data (for reference)
+
+        Returns:
+            Normalized data with derived fields added
+        """
+        # 1. Always add exchange field (implicit metadata)
+        if 'exchange' not in normalized:
+            normalized['exchange'] = vendor_name
+
+        # 2. Handle missing timestamp
+        if 'timestamp' not in normalized:
+            # Try to derive from various sources
+            timestamp = self._derive_timestamp(original_data, vendor_name, data_type)
+            if timestamp:
+                normalized['timestamp'] = timestamp
+            else:
+                # Fallback to current time (with warning in production)
+                normalized['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+
+        # 3. Handle missing symbol for Bitfinex
+        if 'symbol' not in normalized and vendor_name == 'bitfinex':
+            # Bitfinex symbol is in channel subscription, not message
+            # Could extract from context or leave empty (trading daemon knows symbol)
+            pass  # Trading daemon should provide symbol from context
+
+        # 4. Handle missing open_24h for Bitfinex
+        if 'open_24h' not in normalized and vendor_name == 'bitfinex':
+            # Bitfinex doesn't provide open_24h in ticker
+            # Could fetch from REST endpoint or use previous close
+            pass  # Optional field, can be omitted
+
+        # 5. Add metadata about derivation
+        normalized['_derived_fields'] = [
+            field for field in ['exchange', 'timestamp', 'symbol', 'open_24h']
+            if field in normalized and field not in original_data
+        ]
+
+        return normalized
+
+    def _derive_timestamp(
+        self,
+        data: Dict[str, Any],
+        vendor_name: str,
+        data_type: str
+    ) -> Optional[datetime.datetime]:
+        """
+        Derive timestamp from various vendor-specific fields.
+
+        Args:
+            data: Original vendor data
+            vendor_name: Vendor name
+            data_type: Data type
+
+        Returns:
+            datetime object or None if cannot derive
+        """
+        # Try common timestamp field names
+        timestamp_fields = []
+
+        if vendor_name == 'coinbase':
+            timestamp_fields = ['time', 'timestamp', 'created_at']
+        elif vendor_name == 'binance':
+            timestamp_fields = ['E', 'event_time', 'timestamp']
+        elif vendor_name == 'kraken':
+            timestamp_fields = ['timestamp']  # Kraken doesn't have in ticker
+        elif vendor_name == 'bitfinex':
+            timestamp_fields = ['timestamp', 'mts']  # Bitfinex uses mts (milliseconds)
+
+        for field in timestamp_fields:
+            if field in data:
+                value = data[field]
+                if isinstance(value, (int, float)):
+                    # Assume milliseconds since epoch
+                    return datetime.datetime.fromtimestamp(value / 1000.0, datetime.timezone.utc)
+                elif isinstance(value, str):
+                    # Try ISO format
+                    try:
+                        return datetime.datetime.fromisoformat(value.replace('Z', '+00:00'))
+                    except (ValueError, AttributeError):
+                        pass
+
+        # Check for sequence-based timestamp (Kraken)
+        if vendor_name == 'kraken' and 'channelID' in data:
+            # Kraken uses channelID as sequence, no timestamp
+            # Could use message receipt time instead
+            pass
+
+        return None
 
     def _get_value_by_path(self, data: Dict[str, Any], path: str) -> Any:
         """

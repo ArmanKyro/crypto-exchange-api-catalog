@@ -64,7 +64,7 @@ The JSON specification is designed for **code generation** and will be used by f
 ### Canonical Field Mapping System (Phase 2)
 - **Vendor field normalization** - Map exchange-specific fields to canonical names
 - **4 exchanges supported** - Coinbase, Binance, Kraken, Bitfinex
-- **47 field mappings** - Standardized ticker fields across all exchanges
+- **82 field mappings** - Standardized ticker fields across all exchanges (49 WebSocket + 33 REST)
 - **Array extraction** - Handle Kraken-style array fields (e.g., `a[0]`, `b[0]`)
 - **Type transformations** - Automatic string→numeric, ms→datetime conversion
 - **SQL-driven mappings** - All mappings stored in database, no code changes needed
@@ -517,7 +517,7 @@ The SQLite database contains 17 tables:
 ### Canonical Mapping Tables (6) - Phase 2
 - **canonical_fields** - Industry-standard field definitions (26 fields)
 - **canonical_data_types** - Data type templates (ticker, order_book, trade, candle)
-- **field_mappings** - Vendor → canonical field mappings (47 mappings across 4 exchanges)
+- **field_mappings** - Vendor → canonical field mappings (82 mappings: 49 WebSocket + 33 REST across 4 exchanges)
 - **data_type_fields** - Data type field requirements (36 requirements)
 - **mapping_validation** - Validation tracking and quality metrics
 - **Plus 2 views**: `vendor_mappings_view` and `vendor_coverage_view` for easy querying

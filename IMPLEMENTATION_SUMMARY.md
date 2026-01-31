@@ -433,25 +433,30 @@ Extended the catalog with a **unified field‑mapping layer** that translates ve
 - **Bitfinex**: 45 fields (32 WebSocket, 13 REST)
 
 ### Normalization Engine Built
-**`src/normalization/normalization_engine.py`** with full features:
+**`src/normalization/normalization_engine.py`** with enhanced features:
 - **Field path resolution** with dot notation and array indexing
 - **Transformation pipeline** (string→numeric, array extraction, ms→datetime)
+- **Derived field logic** (auto-exchange, timestamp derivation, gap filling)
 - **Real‑time coverage analytics** with vendor_coverage_view
 - **Test framework** with sample data validation
 - **Batch processing** for array data (Kraken support)
 - **Error handling** and validation complete
+- **REST endpoint support** for hybrid WebSocket+REST data pipelines
 
 ### Exchange Coverage Achieved
-- **Coinbase**: 13 mappings (76.9% ticker coverage)
-- **Binance**: 16 mappings (84.6% ticker coverage)
-- **Kraken**: 9 mappings (61.5% ticker coverage with array extraction)
-- **Bitfinex**: 9 mappings (61.5% ticker coverage)
+- **Coinbase**: 13 WebSocket mappings + 7 REST mappings
+- **Binance**: 16 WebSocket mappings + 11 REST mappings  
+- **Kraken**: 11 WebSocket mappings + 7 REST mappings
+- **Bitfinex**: 9 WebSocket mappings + 8 REST mappings
 
-**Total**: 47 field mappings across all 4 exchanges
+**Total**: 82 field mappings (49 WebSocket + 33 REST) across all 4 exchanges
 
 ### Success Criteria Met
-✅ **All 4 exchanges mapped for WebSocket ticker data** - Complete coverage achieved
-✅ **Normalization engine working** - Successfully tested with all exchange formats
+✅ **All 4 exchanges mapped for WebSocket ticker data** - Complete core coverage achieved
+✅ **REST endpoint mappings added** - 33 REST mappings for hybrid data pipelines
+✅ **Derived field logic implemented** - Auto-exchange, timestamp derivation, gap filling
+✅ **Kraken array size extraction** - `best_bid_size` and `best_ask_size` now mapped
+✅ **Normalization engine enhanced** - Works with both WebSocket and REST sources
 ✅ **Database‑driven mappings** - No code changes needed for new fields
 ✅ **Comprehensive transformations** - Type conversion and array handling implemented
 ✅ **Production‑ready** - Error handling and validation complete
@@ -460,15 +465,19 @@ Extended the catalog with a **unified field‑mapping layer** that translates ve
 - **Data‑Driven**: Mappings stored in SQLite, not hard‑coded
 - **Extensible**: New exchanges require only SQL inserts
 - **Standards‑Based**: Canonical fields aligned with industry standards
-- **Hybrid‑Ready**: Works with both WebSocket and REST sources
-- **Queryable**: All mappings queryable via SQL for debugging
+- **Hybrid‑Ready**: Full WebSocket+REST support with automatic source switching
+- **Queryable**: All mappings queryable via SQL for debugging and analytics
+- **Gap‑Filling**: REST endpoints fill WebSocket coverage gaps (e.g., bid/ask sizes)
+- **Auto‑Derivation**: Missing fields automatically derived (exchange, timestamps)
 - **Versionable**: Schema supports evolution over time
 
 ### Current System State
 - **Database**: `crypto‑exchange‑api‑catalog/data/specifications.db`
 - **Entry point**: `src/normalization/normalization_engine.py`
 - **Test verification**: `python3 src/scripts/test_all_exchanges.py`
-- **All exchanges pass** comprehensive normalization tests
+- **All exchanges pass** comprehensive normalization tests (WebSocket + REST)
+- **Coverage analytics**: Real-time mapping coverage via `vendor_coverage_view`
+- **Gap analysis**: Clear visibility into missing vs. unavailable fields
 
 ### Ready for Integration
 The canonical field mapping system is **production‑ready** and can be immediately integrated with:

@@ -209,6 +209,12 @@ class KrakenTickerMapper:
             # Bid array: b = [price, whole_lot_volume, lot_volume] - take price at index 0
             ('b', 'bid_price', {'type': 'array_extract', 'index': 0, 'subtype': 'string_to_numeric'}, 'ticker'),
 
+            # Bid size array: b = [price, whole_lot_volume, lot_volume] - take whole_lot_volume at index 1
+            ('b', 'best_bid_size', {'type': 'array_extract', 'index': 1, 'subtype': 'string_to_numeric'}, 'ticker'),
+
+            # Ask size array: a = [price, whole_lot_volume, lot_volume] - take whole_lot_volume at index 1
+            ('a', 'best_ask_size', {'type': 'array_extract', 'index': 1, 'subtype': 'string_to_numeric'}, 'ticker'),
+
             # Close array: c = [price, lot_volume] - take price at index 0
             ('c', 'last_price', {'type': 'array_extract', 'index': 0, 'subtype': 'string_to_numeric'}, 'ticker'),
 
@@ -368,7 +374,9 @@ Examples:
             # Show what would be mapped
             mappings = [
                 ('a', 'ask_price', 'ticker', 'array[0] (price)'),
+                ('a', 'best_ask_size', 'ticker', 'array[1] (whole_lot_volume)'),
                 ('b', 'bid_price', 'ticker', 'array[0] (price)'),
+                ('b', 'best_bid_size', 'ticker', 'array[1] (whole_lot_volume)'),
                 ('c', 'last_price', 'ticker', 'array[0] (price)'),
                 ('h', 'high_24h', 'ticker', 'array[1] (last_24_hours)'),
                 ('l', 'low_24h', 'ticker', 'array[1] (last_24_hours)'),
@@ -384,7 +392,7 @@ Examples:
                 print(f"{vendor_path:10} → {canonical_name:20} [{entity_type:10}] {description:30} {status}")
 
             print()
-            print("Total: 9 potential mappings")
+            print("Total: 11 potential mappings")
 
         else:
             # Create mappings

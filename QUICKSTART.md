@@ -203,7 +203,7 @@ python3 src/scripts/test_all_exchanges.py
 python3 src/scripts/test_normalization.py --vendor coinbase --data-type ticker
 ```
 
-### Example: Normalize Coinbase Ticker
+### Example: Normalize Coinbase Ticker (WebSocket)
 ```python
 from src.normalization.normalization_engine import NormalizationEngine
 
@@ -226,6 +226,41 @@ normalized = engine.normalize(
 
 print(f"Bid: {normalized['bid_price']}")  # 43210.0
 print(f"Ask: {normalized['ask_price']}")  # 43211.0
+print(f"Exchange: {normalized['exchange']}")  # coinbase (auto-added)
+print(f"Timestamp: {normalized['timestamp']}")  # Derived if missing
+```
+
+### Example: Normalize Binance Ticker (REST Endpoint)
+```python
+from src.normalization.normalization_engine import NormalizationEngine
+
+engine = NormalizationEngine()
+# Sample REST API response from /api/v3/ticker/24hr
+rest_response = {
+    "symbol": "BTCUSDT",
+    "bidPrice": "43210.00",
+    "bidQty": "1.25000000",
+    "askPrice": "43211.00",
+    "askQty": "0.75000000",
+    "lastPrice": "43210.50",
+    "volume": "53245678.9",
+    "highPrice": "43500.00",
+    "lowPrice": "42000.00",
+    "openPrice": "42500.00",
+    "closeTime": 1706697000123
+}
+
+normalized = engine.normalize(
+    vendor_name="binance",
+    data_type="ticker",
+    source_type="rest",
+    input_data=rest_response
+)
+
+print(f"Bid: {normalized['bid_price']}")  # 43210.0
+print(f"Bid size: {normalized['best_bid_size']}")  # 1.25 (from REST, fills WebSocket gap)
+print(f"Exchange: {normalized['exchange']}")  # binance
+print(f"Timestamp: {normalized['timestamp']}")  # 2024-01-31 04:30:00.123+00:00
 ```
 
 ### Check Mapping Coverage
@@ -233,7 +268,14 @@ print(f"Ask: {normalized['ask_price']}")  # 43211.0
 sqlite3 data/specifications.db "SELECT * FROM vendor_coverage_view;"
 ```
 
-**Result**: All 4 exchanges mapped with 47 field mappings.
+**Result**: All 4 exchanges mapped with 82 field mappings (49 WebSocket + 33 REST).
+
+### Create REST Mappings (Optional)
+```bash
+# Create REST endpoint mappings to fill WebSocket gaps
+python3 src/scripts/create_rest_mappings_demo.py --dry-run  # Show what would be mapped
+python3 src/scripts/create_rest_mappings_demo.py --create   # Create actual mappings
+```
 
 ## Next Steps
 
