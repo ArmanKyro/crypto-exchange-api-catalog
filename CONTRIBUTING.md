@@ -57,95 +57,33 @@ python3 main.py discover --vendor coinbase
 
 To add support for a new exchange (e.g., Binance, Kraken):
 
-### 1. Create Adapter File
+### 1. Use Adapter Template
 
-Create `src/adapters/new_vendor_adapter.py`:
+Start with our comprehensive adapter template:
 
-```python
-# src/adapters/new_vendor_adapter.py
-"""
-NewVendor Exchange API adapter.
-"""
-
-from typing import Dict, List, Any
-from src.adapters.base_adapter import BaseVendorAdapter
-from src.utils.logger import get_logger
-
-logger = get_logger(__name__)
-
-
-class NewVendorAdapter(BaseVendorAdapter):
-    """Adapter for NewVendor Exchange API discovery."""
-    
-    def discover_rest_endpoints(self) -> List[Dict[str, Any]]:
-        """Discover NewVendor REST API endpoints."""
-        logger.info("Discovering NewVendor REST endpoints")
-        
-        endpoints = [
-            {
-                "path": "/api/v3/exchangeInfo",
-                "method": "GET",
-                "authentication_required": False,
-                "description": "Current exchange trading rules and symbol information",
-                "query_parameters": {},
-                "response_schema": {"type": "object"},
-                "rate_limit_tier": "public"
-            },
-            # Add more endpoints...
-        ]
-        
-        logger.info(f"Discovered {len(endpoints)} REST endpoints")
-        return endpoints
-    
-    def discover_websocket_channels(self) -> List[Dict[str, Any]]:
-        """Discover NewVendor WebSocket channels."""
-        logger.info("Discovering NewVendor WebSocket channels")
-        
-        channels = [
-            {
-                "channel_name": "trade",
-                "authentication_required": False,
-                "description": "The Trade Streams push raw trade information",
-                "subscribe_format": {
-                    "method": "SUBSCRIBE",
-                    "params": ["btcusdt@trade"],
-                    "id": 1
-                },
-                "message_types": ["trade"]
-            },
-            # Add more channels...
-        ]
-        
-        logger.info(f"Discovered {len(channels)} WebSocket channels")
-        return channels
-    
-    def discover_products(self) -> List[Dict[str, Any]]:
-        """Discover NewVendor trading products."""
-        logger.info("Discovering NewVendor products from live API")
-        
-        try:
-            # Fetch from live API
-            url = f"{self.base_url}/api/v3/exchangeInfo"
-            response = self.http_client.get(url)
-            
-            products = []
-            for item in response.get('symbols', []):
-                product = {
-                    "symbol": item.get("symbol"),
-                    "base_currency": item.get("baseAsset"),
-                    "quote_currency": item.get("quoteAsset"),
-                    "status": "online" if item.get("status") == "TRADING" else "offline",
-                    "vendor_metadata": item
-                }
-                products.append(product)
-            
-            logger.info(f"Discovered {len(products)} products")
-            return products
-            
-        except Exception as e:
-            logger.error(f"Failed to discover products: {e}")
-            raise
+```bash
+cp src/adapters/template_adapter.py src/adapters/new_vendor_adapter.py
 ```
+
+Then edit `src/adapters/new_vendor_adapter.py`:
+
+1. **Rename the class** from `TemplateAdapter` to `NewVendorAdapter`
+2. **Update all placeholders**:
+   - `[EXCHANGE_NAME]` → Your exchange name (e.g., "Bybit", "OKX")
+   - `[BASE_URL]` → Actual REST API base URL (e.g., "https://api.bybit.com")
+   - `[WEBSOCKET_URL]` → Actual WebSocket URL (e.g., "wss://stream.bybit.com")
+3. **Implement the three required methods** based on the exchange's API documentation
+4. **Update documentation URLs** and endpoint patterns
+
+The template includes:
+- Complete structure for all three required methods (`discover_rest_endpoints()`, `discover_websocket_channels()`, `discover_products()`)
+- Examples of common endpoint patterns and WebSocket channel formats
+- Helper methods for candle intervals and validation
+- Comprehensive error handling and logging patterns
+- Placeholders for authenticated endpoints (Phase 3)
+- Extensive inline documentation and implementation guidance
+
+**Important**: The `discover_products()` method MUST make live API calls to fetch actual products. Do not hardcode products. The template provides examples for parsing different exchange response formats.
 
 ### 2. Add Vendor Configuration
 
