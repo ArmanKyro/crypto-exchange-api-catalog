@@ -45,6 +45,10 @@ output/
 *.log
 logs/
 
+# Agent work tracking
+.agent/
+AGENT_STATUS.yaml.backup.*
+
 # IDE
 .vscode/
 .idea/
