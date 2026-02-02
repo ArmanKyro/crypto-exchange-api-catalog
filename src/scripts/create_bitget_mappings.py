@@ -203,8 +203,8 @@ class BitgetTickerMapper:
         mappings = [
             # Price fields (string to numeric conversion)
             ('data.last', 'last_price', {'type': 'string_to_numeric'}, 'ticker'),
-            ('data.bestBid', 'best_bid_price', {'type': 'string_to_numeric'}, 'ticker'),
-            ('data.bestAsk', 'best_ask_price', {'type': 'string_to_numeric'}, 'ticker'),
+            ('data.bestBid', 'bid_price', {'type': 'string_to_numeric'}, 'ticker'),
+            ('data.bestAsk', 'ask_price', {'type': 'string_to_numeric'}, 'ticker'),
 
             # Size fields (string to numeric conversion)
             ('data.bidSz', 'best_bid_size', {'type': 'string_to_numeric'}, 'ticker'),
@@ -215,9 +215,9 @@ class BitgetTickerMapper:
             ('data.low24h', 'low_24h', {'type': 'string_to_numeric'}, 'ticker'),
             ('data.open24h', 'open_24h', {'type': 'string_to_numeric'}, 'ticker'),
 
-            # Volume fields (string to numeric conversion)
-            ('data.quoteVolume', 'volume_24h_quote', {'type': 'string_to_numeric'}, 'ticker'),
-            ('data.baseVolume', 'volume_24h_base', {'type': 'string_to_numeric'}, 'ticker'),
+            # Volume fields (string to numeric conversion) - both quote and base volume map to volume_24h
+            ('data.quoteVolume', 'volume_24h', {'type': 'string_to_numeric'}, 'ticker'),
+            ('data.baseVolume', 'volume_24h', {'type': 'string_to_numeric'}, 'ticker'),
 
             # Symbol/ID fields
             ('data.instId', 'symbol', {'type': 'identity'}, 'ticker'),
@@ -356,15 +356,15 @@ Examples:
             # Based on Bitget WebSocket ticker format from bitget_adapter.py
             mappings = [
                 ('data.last', 'last_price', 'ticker'),
-                ('data.bestBid', 'best_bid_price', 'ticker'),
-                ('data.bestAsk', 'best_ask_price', 'ticker'),
+                ('data.bestBid', 'bid_price', 'ticker'),
+                ('data.bestAsk', 'ask_price', 'ticker'),
                 ('data.bidSz', 'best_bid_size', 'ticker'),
                 ('data.askSz', 'best_ask_size', 'ticker'),
                 ('data.high24h', 'high_24h', 'ticker'),
                 ('data.low24h', 'low_24h', 'ticker'),
                 ('data.open24h', 'open_24h', 'ticker'),
-                ('data.quoteVolume', 'volume_24h_quote', 'ticker'),
-                ('data.baseVolume', 'volume_24h_base', 'ticker'),
+                ('data.quoteVolume', 'volume_24h', 'ticker'),
+                ('data.baseVolume', 'volume_24h', 'ticker'),
                 ('data.ts', 'timestamp', 'ticker'),
                 ('data.instId', 'symbol', 'ticker'),
             ]

@@ -7,6 +7,10 @@ When starting a new thread, immediately run:
 ```bash
 ./thread_restart.sh --update --session-id "your_session_name"
 ```
+Or use the alias:
+```bash
+./thread-reset.sh --update --session-id "your_session_name"
+```
 
 This will:
 1. Read current status from `AGENT_STATUS.yaml`
@@ -28,6 +32,11 @@ This will:
   - Creates session logs and quick references
   - Detects blockers and uncommitted changes
 
+- **`thread-reset.sh`**, **`thread_reset.sh`** - Alias scripts
+  - Provide consistent naming for thread restart
+  - Delegate to `thread_restart.sh` with same functionality
+  - Available as `./thread-reset.sh` or `./thread_reset.sh`
+
 ### Runtime Artifacts (not committed)
 - **`.agent/session_logs/`** - Timestamped session logs
 - **`.agent/quick_ref.txt`** - Current quick reference
@@ -36,8 +45,8 @@ This will:
 ## 🔄 Thread Restart Protocol
 
 ### Standard Workflow
-1. **Read Status**: `./thread_restart.sh` (shows current state)
-2. **Update & Start**: `./thread_restart.sh --update --session-id "session_$(date +%Y%m%d_%H%M%S)"`
+1. **Read Status**: `./thread_restart.sh` (or `./thread-reset.sh`) shows current state
+2. **Update & Start**: `./thread_restart.sh --update --session-id "session_$(date +%Y%m%d_%H%M%S)"` (or use alias)
 3. **Review Output**: Check "AGENT THREAD RESTART - READY FOR NEXT SESSION" section
 4. **Execute Next**: Follow immediate next steps from output
 
@@ -105,9 +114,13 @@ python3 src/scripts/test_exchange_coverage.py {exchange}
 ```bash
 # Quick status check
 ./thread_restart.sh
+# Or use alias:
+./thread-reset.sh
 
 # Start new session with updates
 ./thread_restart.sh --update --session-id "session_$(date +%Y%m%d_%H%M%S)"
+# Or use alias:
+./thread-reset.sh --update --session-id "session_$(date +%Y%m%d_%H%M%S)"
 
 # View quick reference
 cat .agent/quick_ref.txt
