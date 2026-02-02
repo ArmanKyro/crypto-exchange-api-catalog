@@ -1054,7 +1054,7 @@ class BitgetAdapter(BaseVendorAdapter):
         Discover Bitget trading products/symbols from live API.
 
         IMPORTANT: This method MUST make live API calls to fetch actual products.
-        Fetch from Bitget's product endpoint: /api/spot/v1/public/products
+        Fetch from Bitget's product endpoint: /api/v2/spot/public/symbols
 
         Implementation Steps:
         1. Call Bitget's products endpoint
@@ -1074,7 +1074,7 @@ class BitgetAdapter(BaseVendorAdapter):
             # ========================================================================
 
             # Bitget's product endpoint for spot trading
-            products_url = f"{self.base_url}/api/spot/v1/public/products"
+            products_url = f"{self.base_url}/api/v2/spot/public/symbols"
 
             logger.debug(f"Fetching products from: {products_url}")
 
@@ -1105,10 +1105,9 @@ class BitgetAdapter(BaseVendorAdapter):
 
             for symbol_info in symbols_data:
                 try:
-                    # Extract fields from Bitget format
-                    symbol = symbol_info.get('symbol')  # e.g., "BTCUSDT_SPBL"
-                    symbol_name = symbol_info.get('symbolName')  # e.g., "BTCUSDT"
-                    base_currency = symbol_info.get('baseCoin')  # e.g., "BTC"
+                    # Extract fields from Bitget v2 API format
+                    symbol = symbol_info.get('symbol')  # e.g., "LUMIAUSDT"
+                    base_currency = symbol_info.get('baseCoin')  # e.g., "LUMIA"
                     quote_currency = symbol_info.get('quoteCoin')  # e.g., "USDT"
 
                     # Status mapping: online, gray, offline
@@ -1143,16 +1142,16 @@ class BitgetAdapter(BaseVendorAdapter):
                         except ValueError:
                             logger.debug(f"Could not parse maxTradeAmount: {max_trade_amount}")
 
-                    # Price increment from priceScale (decimal places)
-                    price_scale = symbol_info.get('priceScale')
-                    if price_scale:
+                    # Price increment from pricePrecision (decimal places)
+                    price_precision = symbol_info.get('pricePrecision')
+                    if price_precision:
                         try:
-                            # priceScale indicates number of decimal places
-                            # e.g., priceScale="4" means 0.0001 increment
-                            scale = int(price_scale)
+                            # pricePrecision indicates number of decimal places
+                            # e.g., pricePrecision="4" means 0.0001 increment
+                            scale = int(price_precision)
                             price_increment = 10 ** (-scale)
                         except ValueError:
-                            logger.debug(f"Could not parse priceScale: {price_scale}")
+                            logger.debug(f"Could not parse pricePrecision: {price_precision}")
 
                     # Create product dictionary
                     product = {
