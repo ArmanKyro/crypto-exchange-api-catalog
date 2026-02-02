@@ -187,7 +187,7 @@ class SpecificationGenerator:
             return BitstampAdapter(vendor_config)
         elif vendor_name == 'bitget':
             return BitgetAdapter(vendor_config)
-                elif vendor_name == 'bitmart':
+        elif vendor_name == 'bitmart':
             return BitmartAdapter(vendor_config)
         else:
             raise ValueError(f"Unknown vendor: {vendor_name}")
@@ -363,6 +363,13 @@ class SpecificationGenerator:
             )
         elif vendor_name == 'bitget':
             self._link_bitget_feeds(
+                product_ids,
+                endpoint_ids,
+                channel_ids,
+                adapter
+            )
+        elif vendor_name == 'bitmart':
+            self._link_bitmart_feeds(
                 product_ids,
                 endpoint_ids,
                 channel_ids,
@@ -1025,25 +1032,91 @@ class SpecificationGenerator:
         """
         logger.info(f"Linking {len(product_ids)} Bitmart products to feeds")
 
-        # TODO: Implement Bitmart-specific linking logic
-        # Example pattern (update based on actual API):
-        # for symbol, product_id in product_ids.items():
-        #     # REST endpoints
-        #     ticker_key = "GET /api/v3/ticker/24hr"
-        #     if ticker_key in endpoint_ids:
-        #         self.repository.link_product_to_endpoint(
-        #             product_id,
-        #             endpoint_ids[ticker_key],
-        #             'ticker'
-        #         )
-        #
-        #     # WebSocket channels
-        #     for channel_name, channel_id in channel_ids.items():
-        #         self.repository.link_product_to_ws_channel(
-        #             product_id,
-        #             channel_id
-        #         )
-        pass
+        # Get candle intervals from adapter
+        candle_intervals = adapter.get_candle_intervals()
 
+        for symbol, product_id in product_ids.items():
+            # REST endpoints
 
-        logger.info(f"Linked {len(product_ids)} Bitget products to feeds")
+            # Ticker endpoint (all tickers)
+            ticker_key = "GET /spot/v1/ticker"
+            if ticker_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[ticker_key],
+                    'ticker'
+                )
+
+            # Single ticker detail endpoint
+            ticker_detail_key = "GET /spot/v1/ticker/detail"
+            if ticker_detail_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[ticker_detail_key],
+                    'ticker'
+                )
+
+            # Order book endpoint
+            orderbook_key = "GET /spot/v1/symbols/book"
+            if orderbook_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[orderbook_key],
+                    'orderbook'
+                )
+
+            # Order book depth v3 endpoint
+            orderbook_v3_key = "GET /spot/quotation/v3/books"
+            if orderbook_v3_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[orderbook_v3_key],
+                    'orderbook'
+                )
+
+            # Trades endpoint
+            trades_key = "GET /spot/v1/symbols/trades"
+            if trades_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[trades_key],
+                    'trades'
+                )
+
+            # Trades v3 endpoint
+            trades_v3_key = "GET /spot/quotation/v3/trades"
+            if trades_v3_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[trades_v3_key],
+                    'trades'
+                )
+
+            # K-line endpoint
+            kline_key = "GET /spot/v1/symbols/kline"
+            if kline_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[kline_key],
+                    'candles',
+                    intervals=candle_intervals
+                )
+
+            # K-line v3 endpoint
+            kline_v3_key = "GET /spot/quotation/v3/klines"
+            if kline_v3_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[kline_v3_key],
+                    'candles',
+                    intervals=candle_intervals
+                )
+
+            # WebSocket channels - all products support all channels
+            for channel_name, channel_id in channel_ids.items():
+                self.repository.link_product_to_ws_channel(
+                    product_id,
+                    channel_id
+                )
+
+        logger.info(f"Linked {len(product_ids)} Bitmart products to feeds")

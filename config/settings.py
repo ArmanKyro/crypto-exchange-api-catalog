@@ -184,7 +184,7 @@ VENDORS = {
         },
         "authentication": {
             "public_endpoints": True,
-            "requires_api_key": False  # Phase 1: public only
+            "requires_api_key": False,  # Phase 1: public only
         }
     },
     "kucoin": {
@@ -260,11 +260,11 @@ VENDORS = {
             "tickers": "/api/v3/ticker/24hr"
         },
         "rate_limits": {
-            "public": 20  # requests per second (approximate)
+            "public": 20,  # requests per second (approximate)
         },
         "authentication": {
             "public_endpoints": True,
-            "requires_api_key": False  # Phase 1: public only
+            "requires_api_key": False,  # Phase 1: public only
         }
     },
     "bitstamp": {
@@ -281,11 +281,11 @@ VENDORS = {
             "time": "/time/"
         },
         "rate_limits": {
-            "public": 10  # requests per second (approximate)
+            "public": 10,  # requests per second (approximate)
         },
         "authentication": {
             "public_endpoints": True,
-            "requires_api_key": False  # Phase 1: public only
+            "requires_api_key": False,  # Phase 1: public only
         }
     },
     "bitget": {
@@ -304,31 +304,31 @@ VENDORS = {
             "candles": "/api/spot/v1/market/candles"
         },
         "rate_limits": {
-            "public": 20  # requests per second (approximate)
+            "public": 20,  # requests per second (approximate)
         },
         "authentication": {
             "public_endpoints": True,
-            "requires_api_key": False  # Phase 1: public only
+            "requires_api_key": False,  # Phase 1: public only
         }
-    }
+    },
     "bitmart": {
         "enabled": True,
         "display_name": "Bitmart Exchange",
-        "base_url": "https://api.bitmart.com",
+        "base_url": "https://api-cloud.bitmart.com",
         "websocket_url": "wss://ws-manager-compress.bitmart.com",
         "documentation_url": "https://developer-pro.bitmart.com/en/spot",
         "discovery_methods": ["live_api_probing"],
         "endpoints": {
             "products": "/spot/v1/symbols",
-            "time": "/api/v3/time",  # UPDATE: Replace with actual time endpoint
-            "tickers": "/api/v3/ticker/24hr"  # UPDATE: Replace with actual ticker endpoint
+            "time": "/system/time",
+            "tickers": "/spot/v1/ticker"
         },
         "rate_limits": {
-            "public": 20  # UPDATE: Set actual rate limit
+            "public": 20,  # UPDATE: Set actual rate limit
         },
         "authentication": {
             "public_endpoints": True,
-            "requires_api_key": False  # Phase 1: public only
+            "requires_api_key": False,  # Phase 1: public only
         }
     },
 }
