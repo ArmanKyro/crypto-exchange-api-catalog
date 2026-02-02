@@ -37,7 +37,7 @@
 - [x] 11. Bitstamp
 
 ### High-Priority Exchanges to Add (Top 14 by Volume/Impact)
-- [ ] 12. Bitget
+- [→] 12. Bitget (in progress)
 - [ ] 13. BitMart
 - [ ] 14. Crypto.com
 - [ ] 15. Gemini

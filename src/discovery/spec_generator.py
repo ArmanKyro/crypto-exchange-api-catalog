@@ -21,6 +21,7 @@ from src.adapters.gateio_adapter import GateioAdapter
 from src.adapters.huobi_adapter import HuobiAdapter
 from src.adapters.mexc_adapter import MexcAdapter
 from src.adapters.bitstamp_adapter import BitstampAdapter
+from src.adapters.bitget_adapter import BitgetAdapter
 from src.database.repository import SpecificationRepository
 from src.utils.logger import get_logger
 
@@ -183,6 +184,8 @@ class SpecificationGenerator:
             return MexcAdapter(vendor_config)
         elif vendor_name == 'bitstamp':
             return BitstampAdapter(vendor_config)
+        elif vendor_name == 'bitget':
+            return BitgetAdapter(vendor_config)
         else:
             raise ValueError(f"Unknown vendor: {vendor_name}")
 
@@ -350,6 +353,13 @@ class SpecificationGenerator:
             )
         elif vendor_name == 'huobi':
             self._link_huobi_feeds(
+                product_ids,
+                endpoint_ids,
+                channel_ids,
+                adapter
+            )
+        elif vendor_name == 'bitget':
+            self._link_bitget_feeds(
                 product_ids,
                 endpoint_ids,
                 channel_ids,
@@ -900,3 +910,99 @@ class SpecificationGenerator:
                 )
 
         logger.info(f"Linked {len(product_ids)} Huobi products to feeds")
+
+    def _link_bitget_feeds(
+        self,
+        product_ids: Dict[str, int],
+        endpoint_ids: Dict[str, int],
+        channel_ids: Dict[str, int],
+        adapter: BaseVendorAdapter
+    ):
+        """
+        Link Bitget products to their available endpoints and channels.
+
+        Args:
+            product_ids: Dictionary of symbol -> product_id
+            endpoint_ids: Dictionary of endpoint key -> endpoint_id
+            channel_ids: Dictionary of channel_name -> channel_id
+            adapter: BitgetAdapter instance
+        """
+        logger.info("Linking Bitget products to feeds")
+
+        # Get candle intervals from adapter
+        candle_intervals = adapter.get_candle_intervals()
+
+        for symbol, product_id in product_ids.items():
+            # REST endpoints
+            # Ticker endpoint (all tickers)
+            ticker_key = "GET /api/spot/v1/market/tickers"
+            if ticker_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[ticker_key],
+                    'ticker'
+                )
+
+            # Single ticker endpoint (specific symbol)
+            single_ticker_key = "GET /api/spot/v1/market/ticker"
+            if single_ticker_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[single_ticker_key],
+                    'ticker'
+                )
+
+            # Order book depth endpoint
+            depth_key = "GET /api/spot/v1/market/depth"
+            if depth_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[depth_key],
+                    'orderbook'
+                )
+
+            # Merged depth endpoint
+            merge_depth_key = "GET /api/spot/v1/market/merge-depth"
+            if merge_depth_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[merge_depth_key],
+                    'orderbook'
+                )
+
+            # Candlestick endpoint
+            candles_key = "GET /api/spot/v1/market/candles"
+            if candles_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[candles_key],
+                    'candles',
+                    intervals=candle_intervals
+                )
+
+            # Trades endpoint (fills)
+            fills_key = "GET /api/spot/v1/market/fills"
+            if fills_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[fills_key],
+                    'trades'
+                )
+
+            # Trade history endpoint
+            fills_history_key = "GET /api/spot/v1/market/fills-history"
+            if fills_history_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[fills_history_key],
+                    'trades'
+                )
+
+            # WebSocket channels - all products support all channels
+            for channel_name, channel_id in channel_ids.items():
+                self.repository.link_product_to_ws_channel(
+                    product_id,
+                    channel_id
+                )
+
+        logger.info(f"Linked {len(product_ids)} Bitget products to feeds")

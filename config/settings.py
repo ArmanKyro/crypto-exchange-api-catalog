@@ -287,6 +287,29 @@ VENDORS = {
             "public_endpoints": True,
             "requires_api_key": False  # Phase 1: public only
         }
+    },
+    "bitget": {
+        "enabled": True,
+        "display_name": "Bitget Exchange",
+        "base_url": "https://api.bitget.com",
+        "websocket_url": "wss://ws.bitget.com/spot/v1/stream",
+        "documentation_url": "https://bitgetlimited.github.io/apidoc/en/spot/",
+        "discovery_methods": ["live_api_probing"],
+        "endpoints": {
+            "products": "/api/spot/v1/public/products",
+            "time": "/api/spot/v1/public/time",
+            "tickers": "/api/spot/v1/market/tickers",
+            "depth": "/api/spot/v1/market/depth",
+            "fills": "/api/spot/v1/market/fills",
+            "candles": "/api/spot/v1/market/candles"
+        },
+        "rate_limits": {
+            "public": 20  # requests per second (approximate)
+        },
+        "authentication": {
+            "public_endpoints": True,
+            "requires_api_key": False  # Phase 1: public only
+        }
     }
 }
 
