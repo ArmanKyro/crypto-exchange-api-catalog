@@ -311,6 +311,26 @@ VENDORS = {
             "requires_api_key": False  # Phase 1: public only
         }
     }
+    "bitmart": {
+        "enabled": True,
+        "display_name": "Bitmart Exchange",
+        "base_url": "https://api.bitmart.com",
+        "websocket_url": "wss://ws-manager-compress.bitmart.com",
+        "documentation_url": "https://developer-pro.bitmart.com/en/spot",
+        "discovery_methods": ["live_api_probing"],
+        "endpoints": {
+            "products": "/spot/v1/symbols",
+            "time": "/api/v3/time",  # UPDATE: Replace with actual time endpoint
+            "tickers": "/api/v3/ticker/24hr"  # UPDATE: Replace with actual ticker endpoint
+        },
+        "rate_limits": {
+            "public": 20  # UPDATE: Set actual rate limit
+        },
+        "authentication": {
+            "public_endpoints": True,
+            "requires_api_key": False  # Phase 1: public only
+        }
+    },
 }
 
 # Discovery process configuration
