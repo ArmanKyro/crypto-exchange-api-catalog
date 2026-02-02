@@ -88,7 +88,8 @@ log() {
 # Function to extract YAML value
 get_yaml_value() {
     local key="$1"
-    grep "^${key}:" "$STATUS_FILE" | head -1 | sed 's/^[^:]*:[[:space:]]*//'
+    # Match key with optional leading whitespace, handle quoted values
+    grep "[[:space:]]*${key}:" "$STATUS_FILE" | head -1 | sed 's/.*:[[:space:]]*//; s/^"//; s/"$//'
 }
 
 # Function to extract multi-line YAML array
@@ -172,8 +173,8 @@ if [ -f "$STATUS_FILE" ]; then
     log "INFO" "Last Updated: $LAST_UPDATED"
 
     # Get current task
-    CURRENT_TASK=$(get_yaml_value "current_work:" "task")
-    TASK_STATUS=$(get_yaml_value "current_work:" "status")
+    CURRENT_TASK=$(get_yaml_value "task")
+    TASK_STATUS=$(get_yaml_value "status")
 
     if [ -n "$CURRENT_TASK" ]; then
         log "INFO" "Current Task: $CURRENT_TASK"
