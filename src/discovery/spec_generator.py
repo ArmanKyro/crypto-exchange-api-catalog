@@ -202,7 +202,7 @@ class SpecificationGenerator:
             return PoloniexAdapter(vendor_config)
         elif vendor_name == 'deribit':
             return DeribitAdapter(vendor_config)
-                elif vendor_name == 'phemex':
+        elif vendor_name == 'phemex':
             return PhemexAdapter(vendor_config)
         else:
             raise ValueError(f"Unknown vendor: {vendor_name}")
