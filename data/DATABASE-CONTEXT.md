@@ -166,6 +166,86 @@ The canonical field mapping system is **production‑ready** and can be immediat
 
 ## Database Schema
 
+```mermaid
+erDiagram
+    %% Core Catalog Tables
+    vendors ||--o{ discovery_runs : "has"
+    vendors ||--o{ rest_endpoints : "provides"
+    vendors ||--o{ websocket_channels : "provides"
+    vendors ||--o{ products : "lists"
+    
+    products ||--o{ product_rest_feeds : "accesses"
+    rest_endpoints ||--o{ product_rest_feeds : "serves"
+    
+    products ||--o{ product_ws_channels : "subscribes"
+    websocket_channels ||--o{ product_ws_channels : "serves"
+    
+    discovery_runs ||--o{ api_changes : "detects"
+    spec_versions ||--o{ api_changes : "tracks"
+    
+    %% Canonical Mapping System
+    vendors ||--o{ field_mappings : "uses"
+    canonical_fields ||--o{ field_mappings : "maps to"
+    canonical_data_types ||--o{ data_type_fields : "requires"
+    canonical_fields ||--o{ data_type_fields : "used in"
+    
+    vendors {
+        int vendor_id PK
+        string vendor_name
+        string display_name
+        string base_url
+        string websocket_url
+        timestamp created_at
+    }
+    
+    products {
+        int product_id PK
+        int vendor_id FK
+        string symbol
+        string base_currency
+        string quote_currency
+        string status
+        timestamp created_at
+    }
+    
+    rest_endpoints {
+        int endpoint_id PK
+        int vendor_id FK
+        string path
+        string method
+        boolean authentication_required
+        text description
+        timestamp created_at
+    }
+    
+    websocket_channels {
+        int channel_id PK
+        int vendor_id FK
+        string channel_name
+        boolean authentication_required
+        text description
+        timestamp created_at
+    }
+    
+    canonical_fields {
+        int field_id PK
+        string canonical_name
+        string display_name
+        string data_type
+        text description
+    }
+    
+    field_mappings {
+        int mapping_id PK
+        int vendor_id FK
+        int field_id FK
+        string vendor_field_path
+        string transformation_type
+        boolean is_active
+        timestamp created_at
+    }
+```
+
 ### Core Catalog Tables (11)
 1. **vendors** - Exchange registry and metadata
 2. **discovery_runs** - Audit trail of API discovery operations

@@ -22,6 +22,21 @@ Copy this file to `{exchange_name}_CHECKLIST.md` and fill in exchange-specific d
 - [ ] **Coverage Verified** - >50% coverage achieved
 - [ ] **Documentation Updated** - TODO list updated
 
+```mermaid
+gantt
+    title Exchange Integration Timeline
+    dateFormat HH:mm
+    axisFormat %H:%M
+    
+    section Phases
+    Research & Planning :research, 00:00, 1h
+    Configuration :config, after research, 30m
+    Adapter Creation :adapter, after config, 1h
+    Testing :test, after adapter, 45m
+    Field Mappings :mappings, after test, 45m
+    Documentation :docs, after mappings, 30m
+```
+
 ## 🔍 Phase 1: Research & Planning (1-2 hours)
 
 ### API Documentation Review

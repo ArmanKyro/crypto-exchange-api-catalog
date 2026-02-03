@@ -55,6 +55,22 @@ python3 main.py discover --vendor coinbase
 
 ## Adding a New Vendor
 
+```mermaid
+flowchart LR
+    A[Research API Docs] --> B[Create Adapter]
+    B --> C[Add Configuration]
+    C --> D[Register Adapter]
+    D --> E[Test Discovery]
+    E --> F[Create Field Mappings]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+    style D fill:#e8f5e8
+    style E fill:#fce4ec
+    style F fill:#e8f5e8
+```
+
 To add support for a new exchange (e.g., Binance, Kraken):
 
 ### 1. Use Adapter Template

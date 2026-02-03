@@ -132,6 +132,37 @@ python main.py query "SELECT * FROM products WHERE base_currency = 'BTC'"
 
 ### Three-Layer Design
 
+```mermaid
+flowchart TD
+    A[Vendor Adapters<br/>Coinbase, Binance, Kraken, etc.] -->|vendor-specific data| B(SQLite Database)
+    B -->|query & export| C[JSON Export]
+    
+    subgraph A [Exchange Adapters]
+        A1[CoinbaseAdapter]
+        A2[BinanceAdapter]
+        A3[KrakenAdapter]
+        A4[17+ Other Exchanges]
+    end
+    
+    subgraph B [Database Layer]
+        B1[Vendors & Endpoints]
+        B2[WebSocket Channels]
+        B3[Products & Metadata]
+        B4[Canonical Field Mappings]
+    end
+    
+    subgraph C [Export Format]
+        C1[Python snake_case]
+        C2[Go camelCase]
+        C3[Machine-readable Specs]
+    end
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+```
+
+
 ```
 ┌─────────────────────────────────────────┐
 │   Vendor Adapters (Extensible)         │
@@ -155,6 +186,24 @@ python main.py query "SELECT * FROM products WHERE base_currency = 'BTC'"
 ```
 
 ### Discovery Process
+
+```mermaid
+flowchart TD
+    A[Start Discovery] --> B[REST Endpoint Discovery]
+    B --> C[WebSocket Channel Discovery]
+    C --> D[Product Discovery]
+    D --> E[Feed Linking]
+    E --> F[Save to Database]
+    F --> G[Export JSON Specification]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+    style D fill:#e8f5e8
+    style E fill:#fce4ec
+    style F fill:#f3e5f5
+    style G fill:#e1f5fe
+```
 
 1. **REST Endpoint Discovery** - Identify all available HTTP endpoints
 2. **WebSocket Channel Discovery** - Map all subscription channels
@@ -196,6 +245,59 @@ crypto-exchange-api-catalog/
 ├── main.py                      # CLI entry point
 ├── requirements.txt
 └── README.md
+```
+
+```mermaid
+graph TD
+    ROOT[crypto-exchange-api-catalog] --> CONFIG[config/]
+    ROOT --> SRC[src/]
+    ROOT --> SQL[sql/]
+    ROOT --> DATA[data/]
+    ROOT --> OUTPUT[output/]
+    ROOT --> MAIN[main.py]
+    ROOT --> REQ[requirements.txt]
+    ROOT --> README[README.md]
+    
+    CONFIG --> SETTINGS[settings.py]
+    
+    SRC --> ADAPTERS[adapters/]
+    SRC --> DATABASE[database/]
+    SRC --> DISCOVERY[discovery/]
+    SRC --> EXPORT[export/]
+    SRC --> UTILS[utils/]
+    
+    ADAPTERS --> BASE_ADAPTER[base_adapter.py]
+    ADAPTERS --> COINBASE_ADAPTER[coinbase_adapter.py]
+    ADAPTERS --> OTHER_ADAPTERS[17+ exchange adapters]
+    
+    DATABASE --> DB_MANAGER[db_manager.py]
+    DATABASE --> REPOSITORY[repository.py]
+    
+    DISCOVERY --> SPEC_GENERATOR[spec_generator.py]
+    
+    EXPORT --> JSON_EXPORTER[json_exporter.py]
+    
+    UTILS --> LOGGER[logger.py]
+    UTILS --> HTTP_CLIENT[http_client.py]
+    UTILS --> NAMING[naming.py]
+    
+    SQL --> SCHEMA_SQL[schema.sql]
+    SQL --> QUERIES[queries/]
+    SQL --> VIEWS[views/]
+    
+    QUERIES --> VENDOR_ANALYSIS[01_vendor_analysis.sql]
+    QUERIES --> ENDPOINT_DISCOVERY[02_endpoint_discovery.sql]
+    QUERIES --> PRODUCT_CATALOG[04_product_catalog.sql]
+    
+    VIEWS --> COMMON_VIEWS[common_views.sql]
+    
+    DATA --> SPECIFICATIONS_DB[specifications.db]
+    
+    style ROOT fill:#e1f5fe
+    style ADAPTERS fill:#f3e5f5
+    style DATABASE fill:#fff3e0
+    style DISCOVERY fill:#e8f5e8
+    style EXPORT fill:#fce4ec
 ```
 
 ## Usage

@@ -104,6 +104,27 @@ The `specifications.db` now contains:
 
 ### **Normalization Engine Features**
 
+```mermaid
+flowchart LR
+    A[Vendor Data<br/>JSON/WebSocket] --> B[Field Path Resolution]
+    B --> C[Transformation Pipeline]
+    C --> D[Canonical Output]
+    D --> E[Coverage Analytics]
+    
+    subgraph C [Transformations]
+        C1[string→numeric]
+        C2[array extraction]
+        C3[ms→datetime]
+        C4[nested JSON]
+    end
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5  
+    style C fill:#fff3e0
+    style D fill:#e8f5e8
+    style E fill:#fce4ec
+```
+
 The `NormalizationEngine` class provides:
 - **Field path resolution**: Dot notation with array indexing support
 - **Transformation pipeline**: string→numeric, array extraction, datetime conversion

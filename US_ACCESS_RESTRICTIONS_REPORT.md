@@ -36,6 +36,14 @@ This report details the accessibility of cryptocurrency exchange APIs from Unite
 
 ---
 
+```mermaid
+pie title US Exchange Accessibility (10 exchanges tested)
+    "Accessible (7)" : 7
+    "Limited (1)" : 1
+    "Blocked (1)" : 1
+```
+
+
 ## Detailed Analysis
 
 ### 1. **Bybit - Strict US Blocking**
