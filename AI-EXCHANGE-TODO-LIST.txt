@@ -53,7 +53,6 @@
 - [ ] 18. Bittrex
 - [ ] 19. LBank
 - [ ] 20. WhiteBIT
-- [ ] 20. LBank
 - [ ] 21. Upbit
 - [ ] 22. Bithumb
 - [ ] 23. Korbit
@@ -265,5 +264,5 @@ The expansion to 25 exchanges will be considered COMPLETE when:
 ---
 **Last Updated**: Phase 3 complete, starting Phase 4 (25-exchange expansion)
 **Current Progress**: 17/25 exchanges (68% complete)
-**Next Priority**: Complete Phemex implementation, then Bittrex
-**Estimated Completion**: 4 weeks from start
+**Next Priority**: Complete Phemex implementation, then LBank
+**Estimated Completion**: 3 weeks from start
