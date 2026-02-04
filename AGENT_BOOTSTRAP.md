@@ -45,6 +45,29 @@ This will:
 ## 🔄 Thread Restart Protocol
 
 ### Standard Workflow
+
+```mermaid
+flowchart TD
+    A[Start New Thread] --> B[Run thread_restart.sh]
+    B --> C{Check Status & Blockers}
+    C -->|No Blockers| D[Update Session & Context]
+    C -->|Blockers Found| E[Report & Await Resolution]
+    D --> F[Display Next Steps]
+    F --> G[Execute Immediate Actions]
+    G --> H[Commit Progress]
+    H --> I[Repeat Cycle]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+    style D fill:#e8f5e8
+    style E fill:#fce4ec
+    style F fill:#fff3e0
+    style G fill:#e1f5fe
+    style H fill:#f3e5f5
+    style I fill:#e8f5e8
+```
+
 1. **Read Status**: `./thread_restart.sh` (or `./thread-reset.sh`) shows current state
 2. **Update & Start**: `./thread_restart.sh --update --session-id "session_$(date +%Y%m%d_%H%M%S)"` (or use alias)
 3. **Review Output**: Check "AGENT THREAD RESTART - READY FOR NEXT SESSION" section

@@ -9,6 +9,28 @@ Translate vendor‑specific WebSocket/REST fields into canonical, exchange‑agn
 - Zero‑code addition of new exchanges (just add mapping rows)
 - Consistent data models across real‑time (WebSocket) and historical (REST) data
 
+
+```mermaid
+flowchart LR
+    A[Coinbase WebSocket] --> M[Mapping Layer]
+    B[Kraken REST API] --> M
+    C[Binance WebSocket] --> M
+    D[Bitfinex REST API] --> M
+    M --> E[Canonical Ticker Data]
+    M --> F[Canonical Order Book]
+    M --> G[Canonical Trade Data]
+    M --> H[Canonical Candle Data]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#fff3e0
+    style D fill:#e8f5e8
+    style E fill:#fce4ec
+    style F fill:#fff3e0
+    style G fill:#e1f5fe
+    style H fill:#f3e5f5
+```
+
 ## Bounded Scope
 - **Exchanges (4 only)**: Coinbase, Kraken, Binance, Bitfinex
 - **Data Types**: Ticker, Order Book, Trade, Candle (OHLC)

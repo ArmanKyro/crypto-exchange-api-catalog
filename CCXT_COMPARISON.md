@@ -16,6 +16,28 @@ This document provides a comprehensive comparison between our **Vendor API Speci
 | **Extensibility** | Adapter pattern, configuration-driven | Inheritance, extensive base class | Both extensible but different patterns |
 | **Community** | Currently individual project | 740+ contributors, 40k+ stars | CCXT benefits from network effects |
 
+
+```mermaid
+venn
+title Project Focus Areas - Complementary Approaches
+  circle "Our Project" as A #e1f5fe
+  circle "CCXT" as B #f3e5f5
+  
+  A: "API Discovery & Documentation"
+  A: "Field Normalization"
+  A: "Change Detection"
+  A: "SQLite Catalog"
+  
+  B: "Unified Trading API"
+  B: "Order Execution"
+  B: "Real-time Data"
+  B: "Multi-language Support"
+  
+  A ∩ B: "Exchange Coverage"
+  A ∩ B: "Market Data"
+  A ∩ B: "WebSocket Support"
+```
+
 ## 1. Project Goals and Scope Comparison
 
 ### Our Project: Vendor API Specification Generator
