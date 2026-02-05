@@ -32,6 +32,7 @@ from src.adapters.lbank_adapter import LbankAdapter
 from src.adapters.whitebit_adapter import WhitebitAdapter
 from src.adapters.upbit_adapter import UpbitAdapter
 from src.adapters.bithumb_adapter import BithumbAdapter
+from src.adapters.korbit_adapter import KorbitAdapter
 from src.database.repository import SpecificationRepository
 from src.utils.logger import get_logger
 
@@ -216,6 +217,8 @@ class SpecificationGenerator:
             return UpbitAdapter(vendor_config)
         elif vendor_name == 'bithumb':
             return BithumbAdapter(vendor_config)
+        elif vendor_name == 'korbit':
+            return KorbitAdapter(vendor_config)
         else:
             raise ValueError(f"Unknown vendor: {vendor_name}")
 
@@ -1445,23 +1448,69 @@ class SpecificationGenerator:
             adapter: BithumbAdapter instance
         """
         logger.info(f"Linking {len(product_ids)} Bithumb products to feeds")
+    def _link_korbit_feeds(
+        self,
+        product_ids: Dict[str, int],
+        endpoint_ids: Dict[str, int],
+        channel_ids: Dict[str, int],
+        adapter: BaseVendorAdapter
+    ):
+        """
+        Link Korbit products to their available endpoints and channels.
 
-        # TODO: Implement Bithumb-specific linking logic
-        # Example pattern (update based on actual API):
-        # for symbol, product_id in product_ids.items():
-        #     # REST endpoints
-        #     ticker_key = "GET /api/v3/ticker/24hr"
-        #     if ticker_key in endpoint_ids:
-        #         self.repository.link_product_to_endpoint(
-        #             product_id,
-        #             endpoint_ids[ticker_key],
-        #             'ticker'
-        #         )
-        #
-        #     # WebSocket channels
-        #     for channel_name, channel_id in channel_ids.items():
-        #         self.repository.link_product_to_ws_channel(
-        #             product_id,
-        #             channel_id
-        #         )
-        pass
+        Args:
+            product_ids: Dictionary of symbol -> product_id
+            endpoint_ids: Dictionary of endpoint key -> endpoint_id
+            channel_ids: Dictionary of channel_name -> channel_id
+            adapter: KorbitAdapter instance
+        """
+        logger.info(f"Linking {len(product_ids)} Korbit products to feeds")
+
+        # Korbit uses currency pairs like "btc_krw" in API, but we store as "BTC-KRW"
+        # Need to map between formats for endpoint parameters
+
+        for symbol, product_id in product_ids.items():
+            # Convert symbol "BTC-KRW" to Korbit format "btc_krw" for endpoint parameters
+            # Korbit expects lowercase with underscore
+            symbol_parts = symbol.split('-')
+            if len(symbol_parts) != 2:
+                logger.warning(f"Skipping malformed Korbit symbol: {symbol}")
+                continue
+
+            korbit_pair = f"{symbol_parts[0].lower()}_{symbol_parts[1].lower()}"
+
+            # REST endpoints
+            # Ticker endpoint
+            ticker_key = "GET /v1/ticker"
+            if ticker_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[ticker_key],
+                    'ticker',
+                    path_params={'currency_pair': korbit_pair}
+                )
+
+            # Orderbook endpoint
+            orderbook_key = "GET /v1/orderbook"
+            if orderbook_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[orderbook_key],
+                    'order_book',
+                    path_params={'currency_pair': korbit_pair}
+                )
+
+            # WebSocket channels
+            # Link to all public market data channels
+            for channel_name, channel_id in channel_ids.items():
+                # Skip heartbeat channel (not product-specific)
+                if 'heartbeat' in channel_name.lower():
+                    continue
+
+                self.repository.link_product_to_ws_channel(
+                    product_id,
+                    channel_id,
+                    channel_params={'currency_pair': korbit_pair}
+                )
+
+        logger.info(f"Linked {len(product_ids)} Korbit products to endpoints and channels")
