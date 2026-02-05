@@ -56,6 +56,7 @@
 | bithumb | 92.3% (12/13) | 12 | ticker, trade |
 | okx | 84.6% (11/13) | 11 | ticker, trade |
 | crypto_com | 69.2% (9/13) | 9 | ticker |
+| korbit | 69.2% (9/13) | 9 | ticker |
 | bitstamp | 61.5% (8/13) | 8 | ticker |
 | gateio | 61.5% (8/13) | 8 | ticker |
 | kucoin | 53.8% (7/13) | 7 | ticker |
@@ -63,13 +64,13 @@
 | huobi | 30.8% (4/13) | 4 | ticker |
 | mexc | 30.8% (4/13) | 4 | ticker |
 | deribit | 0.0% (0/13) | 0 | ticker |
-| korbit | 0.0% (0/13) | 0 | ticker |
 | lbank | 0.0% (0/13) | 0 | ticker |
 | phemex | 0.0% (0/13) | 0 | ticker |
 | poloniex | 0.0% (0/13) | 0 | ticker |
 | upbit | 0.0% (0/13) | 0 | ticker |
 | whitebit | 0.0% (0/13) | 0 | ticker |
 
+**Total Mappings**: 211 field mappings across all 23 exchanges
 **Total Mappings**: 202 field mappings across all 23 exchanges
 **Total Mappings**: 142 field mappings across all 12 exchanges
 

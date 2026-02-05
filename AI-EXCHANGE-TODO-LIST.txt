@@ -57,11 +57,11 @@
 - [x] 19. LBank (complete - 1511 products)
 - [x] 20. WhiteBIT (complete - 1060 products)
 - [→] Zaif (in progress)
-- [→] Korbit (in progress)
-- [→] Bithumb (in progress)
-- [ ] 21. Bithumb
-- [ ] 22. Korbit
-- [ ] 23. Zaif
+- [x] Korbit (complete - 203 products, 9 field mappings)
+- [x] Bithumb (complete - 464 products, 12 field mappings)
+- [x] 21. Bithumb (complete - 464 products, 12 field mappings)
+- [x] 22. Korbit (complete - 203 products, 9 field mappings)
+- [→] 23. Zaif (in progress)
 - [ ] 24. Reserve slot
 
 
