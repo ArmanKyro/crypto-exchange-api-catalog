@@ -544,12 +544,14 @@ VENDORS = {
         "documentation_url": "https://zaif-api-document.readthedocs.io/",
         "discovery_methods": ["live_api_probing"],
         "endpoints": {
-            "products": "/api/1/ticker",
-            "time": "/api/v3/time",  # UPDATE: Replace with actual time endpoint
-            "tickers": "/api/v3/ticker/24hr"  # UPDATE: Replace with actual ticker endpoint
+            "products": "/api/1/currency_pairs/all",
+            "ticker": "/api/1/ticker/{currency_pair}",
+            "depth": "/api/1/depth/{currency_pair}",
+            "trades": "/api/1/trades/{currency_pair}",
+            "last_price": "/api/1/last_price/{currency_pair}"
         },
         "rate_limits": {
-            "public": 20  # UPDATE: Set actual rate limit
+            "public": 20  # Estimated rate limit for public endpoints
         },
         "authentication": {
             "public_endpoints": True,

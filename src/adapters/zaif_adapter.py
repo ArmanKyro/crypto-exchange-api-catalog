@@ -77,43 +77,33 @@ class ZaifAdapter(BaseVendorAdapter):
         # 1. MARKET DATA ENDPOINTS (Public - No Authentication Required)
         # ============================================================================
 
-        # Basic connectivity and system status endpoints
-        system_endpoints = [
-            {
-                "path": "/api/v3/ping",
-                "method": "GET",
-                "authentication_required": False,
-                "description": "Test connectivity to the REST API",
-                "query_parameters": {},
-                "response_schema": {"type": "object"},
-                "rate_limit_tier": "public"
-            },
-            {
-                "path": "/api/v3/time",
-                "method": "GET",
-                "authentication_required": False,
-                "description": "Get server time",
-                "query_parameters": {},
-                "response_schema": {
-                    "type": "object",
-                    "properties": {
-                        "serverTime": {"type": "integer", "description": "Unix timestamp in milliseconds"}
-                    }
-                },
-                "rate_limit_tier": "public"
-            },
-        ]
-        endpoints.extend(system_endpoints)
-
         # Product/Instrument information endpoints
         product_endpoints = [
             {
-                "path": "/api/v3/exchangeInfo",
+                "path": "/api/1/currency_pairs/all",
                 "method": "GET",
                 "authentication_required": False,
-                "description": "Get exchange trading rules and symbol information",
+                "description": "Get all available currency pairs and their trading rules",
                 "query_parameters": {},
-                "response_schema": {"type": "object"},
+                "response_schema": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "currency_pair": {"type": "string", "description": "Currency pair in format 'btc_jpy'"},
+                            "name": {"type": "string", "description": "Display name like 'BTC/JPY'"},
+                            "title": {"type": "string", "description": "Japanese title"},
+                            "item_japanese": {"type": "string", "description": "Base currency Japanese name"},
+                            "aux_japanese": {"type": "string", "description": "Quote currency Japanese name"},
+                            "item_unit_min": {"type": "number", "description": "Minimum order size"},
+                            "item_unit_step": {"type": "number", "description": "Order size step"},
+                            "aux_unit_min": {"type": "number", "description": "Minimum price increment"},
+                            "aux_unit_step": {"type": "number", "description": "Price step"},
+                            "aux_unit_point": {"type": "integer", "description": "Decimal places for quote currency"},
+                            "is_token": {"type": "boolean", "description": "Whether it's a token pair"}
+                        }
+                    }
+                },
                 "rate_limit_tier": "public"
             },
         ]
@@ -122,134 +112,119 @@ class ZaifAdapter(BaseVendorAdapter):
         # Market data endpoints
         market_data_endpoints = [
             {
-                "path": "/api/v3/ticker/24hr",
+                "path": "/api/1/ticker/{currency_pair}",
                 "method": "GET",
                 "authentication_required": False,
-                "description": "24 hour rolling window price change statistics",
-                "query_parameters": {
-                    "symbol": {
+                "description": "24-hour ticker data for a currency pair",
+                "path_parameters": {
+                    "currency_pair": {
                         "type": "string",
-                        "required": False,
-                        "description": "Trading pair symbol (e.g., BTCUSDT). If not provided, returns all symbols"
+                        "required": True,
+                        "description": "Currency pair (e.g., btc_jpy, eth_jpy)"
                     }
                 },
+                "query_parameters": {},
                 "response_schema": {
                     "type": "object",
                     "properties": {
-                        "symbol": {"type": "string"},
-                        "priceChange": {"type": "string"},
-                        "priceChangePercent": {"type": "string"},
-                        "lastPrice": {"type": "string"},
-                        "volume": {"type": "string"}
+                        "last": {"type": "number", "description": "Last trade price"},
+                        "high": {"type": "number", "description": "24-hour high"},
+                        "low": {"type": "number", "description": "24-hour low"},
+                        "vwap": {"type": "number", "description": "Volume weighted average price"},
+                        "volume": {"type": "number", "description": "24-hour volume"},
+                        "bid": {"type": "number", "description": "Current best bid"},
+                        "ask": {"type": "number", "description": "Current best ask"}
                     }
                 },
                 "rate_limit_tier": "public"
             },
             {
-                "path": "/api/v3/depth",
+                "path": "/api/1/last_price/{currency_pair}",
                 "method": "GET",
                 "authentication_required": False,
-                "description": "Order book depth",
-                "query_parameters": {
-                    "symbol": {
+                "description": "Last trade price for a currency pair",
+                "path_parameters": {
+                    "currency_pair": {
                         "type": "string",
                         "required": True,
-                        "description": "Trading pair symbol"
-                    },
-                    "limit": {
-                        "type": "integer",
-                        "required": False,
-                        "description": "Number of depth levels (5, 10, 20, 50, 100, 500, 1000, 5000)",
-                        "default": 100
+                        "description": "Currency pair (e.g., btc_jpy, eth_jpy)"
                     }
                 },
+                "query_parameters": {},
                 "response_schema": {
                     "type": "object",
                     "properties": {
-                        "lastUpdateId": {"type": "integer"},
-                        "bids": {
-                            "type": "array",
-                            "items": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "minItems": 2,
-                                "maxItems": 2
-                            }
-                        },
+                        "last_price": {"type": "number", "description": "Last trade price"}
+                    }
+                },
+                "rate_limit_tier": "public"
+            },
+            {
+                "path": "/api/1/depth/{currency_pair}",
+                "method": "GET",
+                "authentication_required": False,
+                "description": "Order book depth for a currency pair",
+                "path_parameters": {
+                    "currency_pair": {
+                        "type": "string",
+                        "required": True,
+                        "description": "Currency pair (e.g., btc_jpy, eth_jpy)"
+                    }
+                },
+                "query_parameters": {},
+                "response_schema": {
+                    "type": "object",
+                    "properties": {
                         "asks": {
                             "type": "array",
                             "items": {
                                 "type": "array",
-                                "items": {"type": "string"},
+                                "items": {"type": "number"},
                                 "minItems": 2,
-                                "maxItems": 2
-                            }
+                                "maxItems": 2,
+                                "description": "[price, quantity]"
+                            },
+                            "description": "Ask orders (sell side)"
+                        },
+                        "bids": {
+                            "type": "array",
+                            "items": {
+                                "type": "array",
+                                "items": {"type": "number"},
+                                "minItems": 2,
+                                "maxItems": 2,
+                                "description": "[price, quantity]"
+                            },
+                            "description": "Bid orders (buy side)"
                         }
                     }
                 },
                 "rate_limit_tier": "public"
             },
             {
-                "path": "/api/v3/klines",
+                "path": "/api/1/trades/{currency_pair}",
                 "method": "GET",
                 "authentication_required": False,
-                "description": "Kline/candlestick data",
-                "query_parameters": {
-                    "symbol": {
+                "description": "Recent trades for a currency pair",
+                "path_parameters": {
+                    "currency_pair": {
                         "type": "string",
                         "required": True,
-                        "description": "Trading pair symbol"
-                    },
-                    "interval": {
-                        "type": "string",
-                        "required": True,
-                        "description": "Kline interval (1m, 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1M)"
-                    },
-                    "limit": {
-                        "type": "integer",
-                        "required": False,
-                        "description": "Number of klines to return (1-1000)",
-                        "default": 500
+                        "description": "Currency pair (e.g., btc_jpy, eth_jpy)"
                     }
                 },
-                "response_schema": {
-                    "type": "array",
-                    "items": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "minItems": 12,
-                        "maxItems": 12
-                    }
-                },
-                "rate_limit_tier": "public"
-            },
-            {
-                "path": "/api/v3/trades",
-                "method": "GET",
-                "authentication_required": False,
-                "description": "Recent trades list",
-                "query_parameters": {
-                    "symbol": {
-                        "type": "string",
-                        "required": True,
-                        "description": "Trading pair symbol"
-                    },
-                    "limit": {
-                        "type": "integer",
-                        "required": False,
-                        "description": "Number of trades to return (1-1000)",
-                        "default": 500
-                    }
-                },
+                "query_parameters": {},
                 "response_schema": {
                     "type": "array",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "id": {"type": "integer"},
-                            "price": {"type": "string"},
-                            "qty": {"type": "string"},
-                            "time": {"type": "integer"}
+                            "date": {"type": "integer", "description": "Unix timestamp"},
+                            "price": {"type": "number", "description": "Trade price"},
+                            "amount": {"type": "number", "description": "Trade amount"},
+                            "tid": {"type": "integer", "description": "Trade ID"},
+                            "currency_pair": {"type": "string", "description": "Currency pair"},
+                            "trade_type": {"type": "string", "description": "Trade type (bid/ask)"}
                         }
                     }
                 },
@@ -266,26 +241,25 @@ class ZaifAdapter(BaseVendorAdapter):
         """
         authenticated_endpoints = [
             {
-                "path": "/api/v3/account",
-                "method": "GET",
+                "path": "/api/1/trade",
+                "method": "POST",
                 "authentication_required": True,
-                "description": "Account information",
-                "query_parameters": {},
+                "description": "Place a trade order",
+                "query_parameters": {
+                    "currency_pair": {"type": "string", "required": True},
+                    "action": {"type": "string", "required": True, "enum": ["bid", "ask"]},
+                    "price": {"type": "number", "required": True},
+                    "amount": {"type": "number", "required": True}
+                },
                 "response_schema": {"type": "object"},
                 "rate_limit_tier": "private"
             },
             {
-                "path": "/api/v3/order",
+                "path": "/api/1/balance",
                 "method": "POST",
                 "authentication_required": True,
-                "description": "Create new order",
-                "query_parameters": {
-                    "symbol": {"type": "string", "required": True},
-                    "side": {"type": "string", "required": True, "enum": ["BUY", "SELL"]},
-                    "type": {"type": "string", "required": True, "enum": ["LIMIT", "MARKET"]},
-                    "quantity": {"type": "string", "required": True},
-                    "price": {"type": "string", "required": False}  # Required for LIMIT orders
-                },
+                "description": "Get account balance",
+                "query_parameters": {},
                 "response_schema": {"type": "object"},
                 "rate_limit_tier": "private"
             },
@@ -297,299 +271,31 @@ class ZaifAdapter(BaseVendorAdapter):
         # 3. DYNAMIC DISCOVERY (Optional - if exchange provides endpoint listing)
         # ============================================================================
 
-        # Some exchanges provide API endpoint listings. Example pattern:
-        """
-        try:
-            # If exchange provides endpoint discovery endpoint
-            discovery_url = f"{self.base_url}/api/v3/endpoints"
-            response = self.http_client.get(discovery_url)
-
-            for endpoint_info in response.get('endpoints', []):
-                endpoint = {
-                    "path": endpoint_info['path'],
-                    "method": endpoint_info['method'],
-                    "authentication_required": endpoint_info.get('auth_required', False),
-                    "description": endpoint_info.get('description', ''),
-                    "query_parameters": endpoint_info.get('params', {}),
-                    "response_schema": endpoint_info.get('response_schema', {}),
-                    "rate_limit_tier": endpoint_info.get('rate_limit', 'public')
-                }
-                endpoints.append(endpoint)
-
-        except Exception as e:
-            logger.warning(f"Dynamic endpoint discovery failed: {e}. Using static endpoints.")
-        """
+        # Zaif doesn't provide endpoint discovery endpoint, so we use static endpoints
 
         logger.info(f"Discovered {len(endpoints)} REST endpoints")
         return endpoints
 
     def discover_websocket_channels(self) -> List[Dict[str, Any]]:
         """
-        Discover Zaif WebSocket channels and message formats.
+        Discover Zaif WebSocket channels.
 
-        Implementation Strategy:
-        1. Map all public WebSocket channels from documentation
-        2. Include subscribe/unsubscribe message formats
-        3. Document message types and schemas
-        4. Note authentication requirements
+        Note: Zaif WebSocket API documentation is not readily available.
+        This method returns an empty list for now, focusing on REST API integration.
+        WebSocket support can be added later when documentation is available.
 
         Returns:
-            List of WebSocket channel dictionaries
+            Empty list - WebSocket channels not yet implemented for Zaif
         """
-        logger.info("Discovering Zaif WebSocket channels")
-
-        channels = []
-
-        # ============================================================================
-        # 1. MARKET DATA CHANNELS (Public)
-        # ============================================================================
-
-        # Ticker channel
-        channels.append({
-            "channel_name": "ticker",
-            "authentication_required": False,
-            "description": "Real-time ticker updates for trading pairs",
-            "subscribe_format": {
-                "type": "subscribe",
-                "method": "SUBSCRIPTION",
-                "params": ["ticker@<symbol>"],  # Replace <symbol> with actual pair
-                "id": 1
-            },
-            "unsubscribe_format": {
-                "type": "unsubscribe",
-                "method": "UNSUBSCRIBE",
-                "params": ["ticker@<symbol>"],
-                "id": 2
-            },
-            "message_types": ["ticker", "subscription"],
-            "message_schema": {
-                "type": "object",
-                "properties": {
-                    "e": {"type": "string", "description": "Event type"},
-                    "E": {"type": "integer", "description": "Event time"},
-                    "s": {"type": "string", "description": "Symbol"},
-                    "p": {"type": "string", "description": "Price change"},
-                    "P": {"type": "string", "description": "Price change percent"},
-                    "c": {"type": "string", "description": "Last price"},
-                    "v": {"type": "string", "description": "Volume"},
-                    "q": {"type": "string", "description": "Quote volume"}
-                }
-            },
-            "vendor_metadata": {
-                "channel_pattern": "ticker@{}",  # {} will be replaced with symbol
-                "supports_multiple_symbols": True,
-                "update_frequency": "real-time"
-            }
-        })
-
-        # Order book channel
-        channels.append({
-            "channel_name": "depth",
-            "authentication_required": False,
-            "description": "Real-time order book updates (level 2)",
-            "subscribe_format": {
-                "type": "subscribe",
-                "method": "SUBSCRIPTION",
-                "params": ["depth@<symbol>"],
-                "id": 1
-            },
-            "unsubscribe_format": {
-                "type": "unsubscribe",
-                "method": "UNSUBSCRIBE",
-                "params": ["depth@<symbol>"],
-                "id": 2
-            },
-            "message_types": ["depthUpdate", "snapshot", "subscription"],
-            "message_schema": {
-                "type": "object",
-                "properties": {
-                    "e": {"type": "string", "description": "Event type"},
-                    "E": {"type": "integer", "description": "Event time"},
-                    "s": {"type": "string", "description": "Symbol"},
-                    "U": {"type": "integer", "description": "First update ID"},
-                    "u": {"type": "integer", "description": "Final update ID"},
-                    "b": {
-                        "type": "array",
-                        "items": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "minItems": 2,
-                            "maxItems": 2
-                        },
-                        "description": "Bids"
-                    },
-                    "a": {
-                        "type": "array",
-                        "items": {
-                            "type": "array",
-                            "items": {"type": "string"},
-                            "minItems": 2,
-                            "maxItems": 2
-                        },
-                        "description": "Asks"
-                    }
-                }
-            },
-            "vendor_metadata": {
-                "channel_pattern": "depth@{}",
-                "levels": "full",  # or "partial" for top N levels
-                "update_type": "delta"  # or "snapshot" for full book
-            }
-        })
-
-        # Trade channel
-        channels.append({
-            "channel_name": "trade",
-            "authentication_required": False,
-            "description": "Real-time trade execution updates",
-            "subscribe_format": {
-                "type": "subscribe",
-                "method": "SUBSCRIPTION",
-                "params": ["trade@<symbol>"],
-                "id": 1
-            },
-            "unsubscribe_format": {
-                "type": "unsubscribe",
-                "method": "UNSUBSCRIBE",
-                "params": ["trade@<symbol>"],
-                "id": 2
-            },
-            "message_types": ["trade", "aggregateTrade", "subscription"],
-            "message_schema": {
-                "type": "object",
-                "properties": {
-                    "e": {"type": "string", "description": "Event type"},
-                    "E": {"type": "integer", "description": "Event time"},
-                    "s": {"type": "string", "description": "Symbol"},
-                    "t": {"type": "integer", "description": "Trade ID"},
-                    "p": {"type": "string", "description": "Price"},
-                    "q": {"type": "string", "description": "Quantity"},
-                    "m": {"type": "boolean", "description": "Is buyer maker?"}
-                }
-            },
-            "vendor_metadata": {
-                "channel_pattern": "trade@{}",
-                "trade_type": "individual",  # or "aggregate" for combined trades
-                "include_maker_info": True
-            }
-        })
-
-        # Kline/candlestick channel
-        channels.append({
-            "channel_name": "kline",
-            "authentication_required": False,
-            "description": "Real-time candlestick updates",
-            "subscribe_format": {
-                "type": "subscribe",
-                "method": "SUBSCRIPTION",
-                "params": ["kline_<interval>@<symbol>"],  # e.g., kline_1m@BTCUSDT
-                "id": 1
-            },
-            "unsubscribe_format": {
-                "type": "unsubscribe",
-                "method": "UNSUBSCRIBE",
-                "params": ["kline_<interval>@<symbol>"],
-                "id": 2
-            },
-            "message_types": ["kline", "subscription"],
-            "message_schema": {
-                "type": "object",
-                "properties": {
-                    "e": {"type": "string", "description": "Event type"},
-                    "E": {"type": "integer", "description": "Event time"},
-                    "s": {"type": "string", "description": "Symbol"},
-                    "k": {
-                        "type": "object",
-                        "properties": {
-                            "t": {"type": "integer", "description": "Kline start time"},
-                            "T": {"type": "integer", "description": "Kline close time"},
-                            "o": {"type": "string", "description": "Open price"},
-                            "c": {"type": "string", "description": "Close price"},
-                            "h": {"type": "string", "description": "High price"},
-                            "l": {"type": "string", "description": "Low price"},
-                            "v": {"type": "string", "description": "Volume"}
-                        }
-                    }
-                }
-            },
-            "vendor_metadata": {
-                "channel_pattern": "kline_{}@{}",  # interval then symbol
-                "supported_intervals": ["1m", "5m", "15m", "30m", "1h", "4h", "1d", "1w", "1M"],
-                "update_frequency": "interval-based"
-            }
-        })
-
-        # ============================================================================
-        # 2. HEARTBEAT/CONNECTION MANAGEMENT
-        # ============================================================================
-
-        channels.append({
-            "channel_name": "heartbeat",
-            "authentication_required": False,
-            "description": "Connection heartbeat/ping-pong messages",
-            "subscribe_format": {
-                "type": "subscribe",
-                "method": "LISTEN",
-                "params": ["heartbeat"]
-            },
-            "unsubscribe_format": {
-                "type": "unsubscribe",
-                "method": "UNLISTEN",
-                "params": ["heartbeat"]
-            },
-            "message_types": ["heartbeat", "pong", "connection"],
-            "message_schema": {
-                "type": "object",
-                "properties": {
-                    "type": {"type": "string", "description": "Message type"},
-                    "time": {"type": "integer", "description": "Timestamp"}
-                }
-            },
-            "vendor_metadata": {
-                "keepalive_interval": 30000,  # milliseconds
-                "auto_reconnect": True
-            }
-        })
-
-        # ============================================================================
-        # 3. AUTHENTICATED CHANNELS (Phase 3 - Optional)
-        # ============================================================================
-
-        """
-        channels.append({
-            "channel_name": "account",
-            "authentication_required": True,
-            "description": "Account updates (balance changes, orders, etc.)",
-            "subscribe_format": {
-                "type": "auth",
-                "method": "LOGIN",
-                "params": ["api_key", "signature", "timestamp"]
-            },
-            "message_types": ["outboundAccountInfo", "executionReport", "balanceUpdate"],
-            "message_schema": {"type": "object"},
-            "vendor_metadata": {
-                "requires_signature": True,
-                "update_types": ["balance", "order", "trade"]
-            }
-        })
-        """
-
-        logger.info(f"Discovered {len(channels)} WebSocket channels")
-        return channels
+        logger.info("Zaif WebSocket channels not yet implemented - returning empty list")
+        return []
 
     def discover_products(self) -> List[Dict[str, Any]]:
         """
         Discover Zaif trading products/symbols from live API.
 
-        IMPORTANT: This method MUST make live API calls to fetch actual products.
-        Do not hardcode products. Fetch from exchange's product endpoint.
-
-        Implementation Steps:
-        1. Call the exchange's product/info endpoint (e.g., /api/v3/exchangeInfo)
-        2. Parse the response to extract symbol information
-        3. Map to our standard product format
-        4. Handle pagination if needed
-        5. Implement error handling and retry logic
+        Fetches currency pairs from /api/1/currency_pairs/all endpoint and maps
+        to standard product format.
 
         Returns:
             List of product dictionaries in standard format
@@ -598,121 +304,86 @@ class ZaifAdapter(BaseVendorAdapter):
 
         try:
             # ========================================================================
-            # 1. FETCH PRODUCTS FROM EXCHANGE API
+            # 1. FETCH PRODUCTS FROM ZAIF API
             # ========================================================================
 
-            # Most exchanges have an endpoint like /api/v3/exchangeInfo or /products
-            # Check the exchange documentation for the correct endpoint
-            products_url = f"{self.base_url}/api/v3/exchangeInfo"
-
-            # If the exchange uses a different endpoint, update this:
-            # products_url = f"{self.base_url}/products"
-            # products_url = f"{self.base_url}/v2/public/symbols"
-
+            products_url = f"{self.base_url}/api/1/currency_pairs/all"
             logger.debug(f"Fetching products from: {products_url}")
 
             # Make the API request
             response = self.http_client.get(products_url)
 
             # ========================================================================
-            # 2. PARSE RESPONSE BASON ON EXCHANGE FORMAT
+            # 2. PARSE ZAIF RESPONSE FORMAT
             # ========================================================================
+
+            if not isinstance(response, list):
+                logger.error(f"Unexpected response format: {type(response)}")
+                raise Exception(f"Unexpected response format from Zaif. Expected list, got {type(response)}")
 
             products = []
 
-            # Common response format patterns:
-            # Pattern 1: Binance-style (response['symbols'] contains list)
-            if 'symbols' in response:
-                symbols_data = response['symbols']
-            # Pattern 2: Direct array response
-            elif isinstance(response, list):
-                symbols_data = response
-            # Pattern 3: Nested under 'data' or 'result'
-            elif 'data' in response:
-                symbols_data = response['data']
-            elif 'result' in response:
-                symbols_data = response['result']
-            else:
-                # Default to trying to use the response directly
-                symbols_data = response
-
-            # Ensure we have an iterable
-            if not isinstance(symbols_data, list):
-                logger.error(f"Unexpected response format: {type(symbols_data)}")
-                raise Exception(f"Unexpected response format from Zaif")
-
             # ========================================================================
-            # 3. PROCESS EACH SYMBOL/PRODUCT
+            # 3. PROCESS EACH CURRENCY PAIR
             # ========================================================================
 
-            for symbol_info in symbols_data:
+            for pair_info in response:
                 try:
-                    # Extract common fields with fallbacks for different exchange formats
+                    # Extract currency pair identifier
+                    currency_pair = pair_info.get('currency_pair', '')
+                    name = pair_info.get('name', '')
 
-                    # Symbol/ID field (different exchanges use different keys)
-                    symbol = (
-                        symbol_info.get('symbol') or
-                        symbol_info.get('id') or
-                        symbol_info.get('name') or
-                        symbol_info.get('pair')
-                    )
-
-                    # Base currency (what you're buying/selling)
-                    base_currency = (
-                        symbol_info.get('baseAsset') or
-                        symbol_info.get('base_currency') or
-                        symbol_info.get('base') or
-                        symbol_info.get('baseCurrency')
-                    )
-
-                    # Quote currency (what you're trading with)
-                    quote_currency = (
-                        symbol_info.get('quoteAsset') or
-                        symbol_info.get('quote_currency') or
-                        symbol_info.get('quote') or
-                        symbol_info.get('quoteCurrency')
-                    )
-
-                    # Status (trading availability)
-                    status_raw = (
-                        symbol_info.get('status') or
-                        symbol_info.get('state') or
-                        symbol_info.get('trading') or
-                        symbol_info.get('active')
-                    )
-
-                    # Normalize status to our standard values
-                    if status_raw in ['TRADING', 'trading', 'online', 'enabled', True]:
-                        status = 'online'
-                    elif status_raw in ['HALT', 'halted', 'offline', 'disabled', False]:
-                        status = 'offline'
-                    elif status_raw in ['BREAK', 'delisted', 'expired']:
-                        status = 'delisted'
+                    # Determine symbol format: convert "btc_jpy" to "BTC-JPY"
+                    if currency_pair:
+                        # currency_pair is like "btc_jpy", "eth_jpy", etc.
+                        parts = currency_pair.split('_')
+                        if len(parts) == 2:
+                            base = parts[0].upper()
+                            quote = parts[1].upper()
+                            symbol = f"{base}-{quote}"
+                        else:
+                            # Fallback to name field if currency_pair format unexpected
+                            symbol = name.replace('/', '-').upper()
                     else:
-                        status = 'offline'  # Default if unknown
+                        # Fallback to name field
+                        symbol = name.replace('/', '-').upper()
 
-                    # Trading limits/precision (if available)
-                    min_order_size = None
-                    max_order_size = None
-                    price_increment = None
+                    # Extract base and quote currencies
+                    base_currency = None
+                    quote_currency = None
 
-                    # Try to extract from various exchange formats
-                    if 'filters' in symbol_info:
-                        for filter_item in symbol_info.get('filters', []):
-                            filter_type = filter_item.get('filterType')
-                            if filter_type == 'LOT_SIZE':
-                                min_order_size = float(filter_item.get('minQty', 0))
-                                max_order_size = float(filter_item.get('maxQty', 0))
-                            elif filter_type == 'PRICE_FILTER':
-                                price_increment = float(filter_item.get('tickSize', 0))
+                    if currency_pair and '_' in currency_pair:
+                        base, quote = currency_pair.split('_')
+                        base_currency = base.upper()
+                        quote_currency = quote.upper()
+                    elif name and '/' in name:
+                        base, quote = name.split('/')
+                        base_currency = base.strip().upper()
+                        quote_currency = quote.strip().upper()
+                    else:
+                        logger.warning(f"Cannot extract currencies from pair: {pair_info}")
+                        continue
 
-                    # Alternative field names
-                    if min_order_size is None:
-                        min_order_size = float(symbol_info.get('base_min_size', 0)) if symbol_info.get('base_min_size') else None
-                    if max_order_size is None:
-                        max_order_size = float(symbol_info.get('base_max_size', 0)) if symbol_info.get('base_max_size') else None
-                    if price_increment is None:
-                        price_increment = float(symbol_info.get('quote_increment', 0)) if symbol_info.get('quote_increment') else None
+                    # All Zaif pairs are assumed to be online/trading
+                    status = 'online'
+
+                    # Extract trading limits from Zaif response
+                    min_order_size = pair_info.get('item_unit_min')
+                    max_order_size = None  # Zaif doesn't provide max order size
+                    price_increment = pair_info.get('aux_unit_step')
+
+                    # Convert to appropriate types
+                    if min_order_size is not None:
+                        try:
+                            min_order_size = float(min_order_size)
+                        except (ValueError, TypeError):
+                            min_order_size = None
+
+                    if price_increment is not None:
+                        try:
+                            price_increment = float(price_increment)
+                        except (ValueError, TypeError):
+                            price_increment = None
 
                     # Create product dictionary
                     product = {
@@ -723,18 +394,18 @@ class ZaifAdapter(BaseVendorAdapter):
                         "min_order_size": min_order_size,
                         "max_order_size": max_order_size,
                         "price_increment": price_increment,
-                        "vendor_metadata": symbol_info  # Store full raw data
+                        "vendor_metadata": pair_info  # Store full raw data
                     }
 
                     # Validate required fields
                     if not all([product["symbol"], product["base_currency"], product["quote_currency"]]):
-                        logger.warning(f"Skipping product with missing required fields: {symbol_info}")
+                        logger.warning(f"Skipping product with missing required fields: {pair_info}")
                         continue
 
                     products.append(product)
 
                 except Exception as e:
-                    logger.warning(f"Failed to parse product {symbol_info.get('symbol', 'unknown')}: {e}")
+                    logger.warning(f"Failed to parse product {pair_info.get('currency_pair', 'unknown')}: {e}")
                     continue
 
             # ========================================================================
@@ -745,16 +416,12 @@ class ZaifAdapter(BaseVendorAdapter):
                 logger.error("No products discovered from API response")
                 raise Exception("No products found in API response")
 
-            logger.info(f"Discovered {len(products)} products")
-
-            # Optional: Filter to only online products if needed
-            # online_products = [p for p in products if p['status'] == 'online']
-            # logger.info(f"Online products: {len(online_products)}")
+            logger.info(f"Discovered {len(products)} Zaif products")
 
             return products
 
         except Exception as e:
-            logger.error(f"Failed to discover products: {e}")
+            logger.error(f"Failed to discover Zaif products: {e}")
             # Re-raise to ensure discovery run is marked as failed
             raise Exception(f"Product discovery failed for Zaif: {e}")
 

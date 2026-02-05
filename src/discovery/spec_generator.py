@@ -220,7 +220,7 @@ class SpecificationGenerator:
             return BithumbAdapter(vendor_config)
         elif vendor_name == 'korbit':
             return KorbitAdapter(vendor_config)
-                elif vendor_name == 'zaif':
+        elif vendor_name == 'zaif':
             return ZaifAdapter(vendor_config)
         else:
             raise ValueError(f"Unknown vendor: {vendor_name}")
@@ -1533,25 +1533,71 @@ class SpecificationGenerator:
         """
         logger.info(f"Linking {len(product_ids)} Zaif products to feeds")
 
-        # TODO: Implement Zaif-specific linking logic
-        # Example pattern (update based on actual API):
-        # for symbol, product_id in product_ids.items():
-        #     # REST endpoints
-        #     ticker_key = "GET /api/v3/ticker/24hr"
-        #     if ticker_key in endpoint_ids:
-        #         self.repository.link_product_to_endpoint(
-        #             product_id,
-        #             endpoint_ids[ticker_key],
-        #             'ticker'
-        #         )
-        #
-        #     # WebSocket channels
-        #     for channel_name, channel_id in channel_ids.items():
-        #         self.repository.link_product_to_ws_channel(
-        #             product_id,
-        #             channel_id
-        #         )
-        pass
+        # Zaif uses currency pairs like "btc_jpy" in API, but we store as "BTC-JPY"
+        # Need to map between formats for endpoint parameters
 
+        for symbol, product_id in product_ids.items():
+            # Convert symbol "BTC-JPY" to Zaif format "btc_jpy" for endpoint parameters
+            # Zaif expects lowercase with underscore
+            symbol_parts = symbol.split('-')
+            if len(symbol_parts) != 2:
+                logger.warning(f"Skipping malformed Zaif symbol: {symbol}")
+                continue
 
-        logger.info(f"Linked {len(product_ids)} Korbit products to endpoints and channels")
+            zaif_pair = f"{symbol_parts[0].lower()}_{symbol_parts[1].lower()}"
+
+            # REST endpoints - link to market data endpoints that accept currency_pair parameter
+            # Last price endpoint
+            last_price_key = "GET /api/1/last_price/{currency_pair}"
+            if last_price_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[last_price_key],
+                    'ticker',
+                    path_params={'currency_pair': zaif_pair}
+                )
+
+            # Ticker endpoint (24-hour statistics)
+            ticker_key = "GET /api/1/ticker/{currency_pair}"
+            if ticker_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[ticker_key],
+                    'ticker',
+                    path_params={'currency_pair': zaif_pair}
+                )
+
+            # Order book depth endpoint
+            depth_key = "GET /api/1/depth/{currency_pair}"
+            if depth_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[depth_key],
+                    'order_book',
+                    path_params={'currency_pair': zaif_pair}
+                )
+
+            # Recent trades endpoint
+            trades_key = "GET /api/1/trades/{currency_pair}"
+            if trades_key in endpoint_ids:
+                self.repository.link_product_to_endpoint(
+                    product_id,
+                    endpoint_ids[trades_key],
+                    'trade',
+                    path_params={'currency_pair': zaif_pair}
+                )
+
+            # WebSocket channels
+            # Link to all public market data channels
+            for channel_name, channel_id in channel_ids.items():
+                # Skip heartbeat channel (not product-specific)
+                if 'heartbeat' in channel_name.lower():
+                    continue
+
+                self.repository.link_product_to_ws_channel(
+                    product_id,
+                    channel_id,
+                    channel_params={'currency_pair': zaif_pair}
+                )
+
+        logger.info(f"Linked {len(product_ids)} Zaif products to endpoints and channels")
